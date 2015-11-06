@@ -3109,6 +3109,7 @@ var ReactTelephoneInput = React.createClass({
         inputInvalidClassName: React.PropTypes.string,
         flagClassName: React.PropTypes.string,
         flagViewClassName: React.PropTypes.string,
+        flagViewSelectedClassName: React.PropTypes.string,
         flagViewShownClassName: React.PropTypes.string,
         value: React.PropTypes.string,
         autoFormat: React.PropTypes.bool,
@@ -3496,7 +3497,12 @@ var ReactTelephoneInput = React.createClass({
             type: 'tel',
             className: inputClasses,
             autoComplete: 'tel',
-            placeholder: '+1 (702) 123-4567' }), React.createElement('div', { ref: 'flagDropDownButton', className: flagViewClasses, onKeyDown: this.handleKeydown }, React.createElement('div', { ref: 'selectedFlag', onClick: this.handleFlagDropdownClick, className: 'selected-flag', title: this.state.selectedCountry.name + ': + ' + this.state.selectedCountry.dialCode }, React.createElement('div', { className: inputFlagClasses, style: this.getFlagStyle() }, React.createElement('div', { className: arrowClasses }))), this.state.showDropDown ? this.getCountryDropDownList() : ''));
+            placeholder: '+1 (702) 123-4567' }), React.createElement('div', { ref: 'flagDropDownButton', className: flagViewClasses, onKeyDown: this.handleKeydown }, React.createElement('div', {
+            className: this.props.flagViewSelectedClassName,
+            ref: 'selectedFlag',
+            onClick: this.props.showDropDownOnClick ? this.handleFlagDropdownClick : null,
+            title: this.state.selectedCountry.name + ': + ' + this.state.selectedCountry.dialCode
+        }, React.createElement('div', { className: inputFlagClasses, style: this.getFlagStyle() }, this.props.showDropDownOnClick ? React.createElement('div', { className: arrowClasses }) : null)), this.state.showDropDown ? this.getCountryDropDownList() : ''));
     }
 });
 

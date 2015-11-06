@@ -89,6 +89,7 @@ var ReactTelephoneInput = React.createClass({
         inputInvalidClassName: React.PropTypes.string,
         flagClassName: React.PropTypes.string,
         flagViewClassName: React.PropTypes.string,
+        flagViewSelectedClassName: React.PropTypes.string,
         flagViewShownClassName: React.PropTypes.string,
         value: React.PropTypes.string,
         autoFormat: React.PropTypes.bool,
@@ -499,9 +500,14 @@ var ReactTelephoneInput = React.createClass({
                     autoComplete='tel'
                     placeholder='+1 (702) 123-4567'/>
                 <div ref='flagDropDownButton' className={flagViewClasses} onKeyDown={this.handleKeydown} >
-                    <div ref='selectedFlag' onClick={this.handleFlagDropdownClick} className='selected-flag' title={`${this.state.selectedCountry.name}: + ${this.state.selectedCountry.dialCode}`}>
+                    <div
+                        className={this.props.flagViewSelectedClassName}
+                        ref='selectedFlag'
+                        onClick={this.props.showDropDownOnClick ? this.handleFlagDropdownClick : null}
+                        title={`${this.state.selectedCountry.name}: + ${this.state.selectedCountry.dialCode}`}
+                    >
                         <div className={inputFlagClasses} style={this.getFlagStyle()}>
-                            <div className={arrowClasses}></div>
+                            { this.props.showDropDownOnClick ? <div className={arrowClasses}></div> : null }
                         </div>
                     </div>
                     {this.state.showDropDown ? this.getCountryDropDownList() : ''}
