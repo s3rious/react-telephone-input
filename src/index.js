@@ -106,7 +106,6 @@ var ReactTelephoneInput = React.createClass({
             onlyCountries: allCountries,
             defaultCountry: allCountries[0].iso2,
             isValid: isNumberValid,
-            flagsImagePath: 'flags.png',
             onEnterKeyPress: function () {}
         };
     },
@@ -441,7 +440,7 @@ var ReactTelephoneInput = React.createClass({
                     data-dial-code="1"
                     data-country-code={country.iso2}
                     onClick={this.handleFlagItemClick.bind(this, country)}>
-                    <div className={inputFlagClasses} style={this.getFlagStyle()} />
+                    <div className={inputFlagClasses}/>
                     <span className='country-name'>{country.name}</span>
                     <span className='dial-code'>{'+' + country.dialCode}</span>
                 </li>
@@ -461,13 +460,6 @@ var ReactTelephoneInput = React.createClass({
                 {countryDropDownList}
             </ul>
         );
-    },
-    getFlagStyle() {
-        return {
-            width: 16,
-            height: 11,
-            backgroundImage: `url(${this.props.flagsImagePath})`
-        };
     },
     render() {
         var arrowClasses = classNames({
@@ -506,7 +498,7 @@ var ReactTelephoneInput = React.createClass({
                         onClick={this.props.showDropDownOnClick ? this.handleFlagDropdownClick : null}
                         title={`${this.state.selectedCountry.name}: + ${this.state.selectedCountry.dialCode}`}
                     >
-                        <div className={inputFlagClasses} style={this.getFlagStyle()}>
+                        <div className={inputFlagClasses}>
                             { this.props.showDropDownOnClick ? <div className={arrowClasses}></div> : null }
                         </div>
                     </div>

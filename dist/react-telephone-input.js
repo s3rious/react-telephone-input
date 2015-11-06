@@ -3127,7 +3127,6 @@ var ReactTelephoneInput = React.createClass({
             onlyCountries: allCountries,
             defaultCountry: allCountries[0].iso2,
             isValid: isNumberValid,
-            flagsImagePath: 'flags.png',
             onEnterKeyPress: function onEnterKeyPress() {}
         };
     },
@@ -3461,7 +3460,7 @@ var ReactTelephoneInput = React.createClass({
                 className: itemClasses,
                 'data-dial-code': '1',
                 'data-country-code': country.iso2,
-                onClick: this.handleFlagItemClick.bind(this, country) }, React.createElement('div', { className: inputFlagClasses, style: this.getFlagStyle() }), React.createElement('span', { className: 'country-name' }, country.name), React.createElement('span', { className: 'dial-code' }, '+' + country.dialCode));
+                onClick: this.handleFlagItemClick.bind(this, country) }, React.createElement('div', { className: inputFlagClasses }), React.createElement('span', { className: 'country-name' }, country.name), React.createElement('span', { className: 'dial-code' }, '+' + country.dialCode));
         }, this);
 
         var dashedLi = React.createElement('li', { key: "dashes", className: 'divider' });
@@ -3470,13 +3469,6 @@ var ReactTelephoneInput = React.createClass({
 
         var dropDownClasses = classNames((_classNames2 = {}, _defineProperty(_classNames2, this.props.dropDownClassName, true), _defineProperty(_classNames2, this.props.dropDownShownClassName, !this.state.showDropDown), _classNames2));
         return React.createElement('ul', { ref: 'flagDropdownList', className: dropDownClasses }, countryDropDownList);
-    },
-    getFlagStyle: function getFlagStyle() {
-        return {
-            width: 16,
-            height: 11,
-            backgroundImage: 'url(' + this.props.flagsImagePath + ')'
-        };
     },
     render: function render() {
         var _classNames3, _classNames4, _classNames5;
@@ -3503,7 +3495,7 @@ var ReactTelephoneInput = React.createClass({
             ref: 'selectedFlag',
             onClick: this.props.showDropDownOnClick ? this.handleFlagDropdownClick : null,
             title: this.state.selectedCountry.name + ': + ' + this.state.selectedCountry.dialCode
-        }, React.createElement('div', { className: inputFlagClasses, style: this.getFlagStyle() }, this.props.showDropDownOnClick ? React.createElement('div', { className: arrowClasses }) : null)), this.state.showDropDown ? this.getCountryDropDownList() : ''));
+        }, React.createElement('div', { className: inputFlagClasses }, this.props.showDropDownOnClick ? React.createElement('div', { className: arrowClasses }) : null)), this.state.showDropDown ? this.getCountryDropDownList() : ''));
     }
 });
 
