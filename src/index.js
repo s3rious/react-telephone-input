@@ -23,8 +23,6 @@ var classNames = require('classnames');
 var countryData = require('./country_data');
 var allCountries = countryData.allCountries;
 
-require('../less/default.less');
-
 if (typeof document !== 'undefined') {
   var isModernBrowser = Boolean(document.createElement('input').setSelectionRange);
 } else {
@@ -32,16 +30,16 @@ if (typeof document !== 'undefined') {
 }
 
 var keys = {
-        UP: 38,
-        DOWN: 40,
-        RIGHT: 39,
-        LEFT: 37,
-        ENTER: 13,
-        ESC: 27,
-        PLUS: 43,
-        A: 65,
-        Z: 90,
-        SPACE: 32
+    UP: 38,
+    DOWN: 40,
+    RIGHT: 39,
+    LEFT: 37,
+    ENTER: 13,
+    ESC: 27,
+    PLUS: 43,
+    A: 65,
+    Z: 90,
+    SPACE: 32
 };
 
 function isNumberValid(inputNumber) {
@@ -78,6 +76,20 @@ var ReactTelephoneInput = React.createClass({
         };
     },
     propTypes: {
+        className: React.PropTypes.string,
+        countryClassName: React.PropTypes.string,
+        countryPreferredClassName: React.PropTypes.string,
+        countryActiveClassName: React.PropTypes.string,
+        countryHighlightClassName: React.PropTypes.string,
+        dropDownClassName: React.PropTypes.string,
+        dropDownShownClassName: React.PropTypes.string,
+        arrowClassName: React.PropTypes.string,
+        arrowDroppedClassName: React.PropTypes.string,
+        inputClassName: React.PropTypes.string,
+        inputInvalidClassName: React.PropTypes.string,
+        flagClassName: React.PropTypes.string,
+        flagViewClassName: React.PropTypes.string,
+        flagViewShownClassName: React.PropTypes.string,
         value: React.PropTypes.string,
         autoFormat: React.PropTypes.bool,
         defaultCountry: React.PropTypes.string,
@@ -411,10 +423,10 @@ var ReactTelephoneInput = React.createClass({
 
         var countryDropDownList = map(this.state.preferredCountries.concat(this.props.onlyCountries), function(country, index) {
             let itemClasses = classNames({
-                country: true,
-                preferred: country.iso2 === 'us' || country.iso2 === 'gb',
-                active: country.iso2 === 'us',
-                highlight: this.state.highlightCountryIndex === index
+                [this.props.countryClassName]: true,
+                [this.props.countryPreferredClassName]: country.iso2 === 'us' || country.iso2 === 'gb',
+                [this.props.countryActiveClassName]: country.iso2 === 'us',
+                [this.props.countryHighlightClassName]: this.state.highlightCountryIndex === index
             });
 
             var inputFlagClasses = `flag ${country.iso2}`;
@@ -440,8 +452,8 @@ var ReactTelephoneInput = React.createClass({
         countryDropDownList.splice(this.state.preferredCountries.length, 0, dashedLi);
 
         const dropDownClasses = classNames({
-            'country-list': true,
-            'hide': !this.state.showDropDown
+            [this.props.dropDownClassName]: true,
+            [this.props.dropDownShownClassName]: !this.state.showDropDown
         });
         return (
             <ul ref="flagDropdownList" className={dropDownClasses}>
@@ -458,23 +470,23 @@ var ReactTelephoneInput = React.createClass({
     },
     render() {
         var arrowClasses = classNames({
-            'arrow': true,
-            'up': this.state.showDropDown
+            [this.props.arrowClassName]: true,
+            [this.props.arrowDroppedClassName]: this.state.showDropDown
         });
         var inputClasses = classNames({
-            'form-control': true,
-            'invalid-number': !this.props.isValid(this.state.formattedNumber.replace(/\D/g, ''))
+            [this.props.inputClassName]: true,
+            [this.props.inputInvalidClassName]: !this.props.isValid(this.state.formattedNumber.replace(/\D/g, ''))
         });
 
         var flagViewClasses = classNames({
-            'flag-dropdown': true,
-            'open-dropdown': this.state.showDropDown
+            [this.props.flagViewClassName]: true,
+            [this.props.flagViewShownClassName]: this.state.showDropDown
         });
 
-        var inputFlagClasses = `flag ${this.state.selectedCountry.iso2}`;
+        var inputFlagClasses = `${this.props.flagClassName} ${this.props.flagClassName}_${this.state.selectedCountry.iso2}`;
 
         return (
-            <div className='react-tel-input'>
+            <div className={this.props.className}>
                 <input
                     onChange={this.handleInput}
                     onClick={this.handleInputClick}
