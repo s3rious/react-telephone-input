@@ -118,7 +118,7 @@ var ReactTelephoneInput = React.createClass({
     componentDidMount() {
         document.addEventListener('keydown', this.handleKeydown);
 
-        this._cursorToEnd();
+        this._cursorToEnd(false);
         if(typeof this.props.onChange === 'function') {
             this.props.onChange(this.state.formattedNumber);
         }
@@ -198,9 +198,14 @@ var ReactTelephoneInput = React.createClass({
     },
 
     // put the cursor to the end of the input (usually after a focus event)
-    _cursorToEnd() {
+    _cursorToEnd(focus = true) {
         var input = this.refs.numberInput.getDOMNode();
-        input.focus();
+        if (focus) {
+            input.focus();
+        }
+        else {
+            this.handleInputFocus();
+        }
         if (isModernBrowser) {
             var len = input.value.length;
             input.setSelectionRange(len, len);
