@@ -3032,6 +3032,7 @@ var first = require('lodash/array/first');
 var rest = require('lodash/array/rest');
 var debounce = require('lodash/function/debounce');
 var memoize = require('lodash/function/memoize');
+var isFunction = require('lodash/lang/isFunction');
 // import lodash string methods
 var trim = require('lodash/string/trim');
 var startsWith = require('lodash/string/startsWith');
@@ -3362,6 +3363,9 @@ var ReactTelephoneInput = React.createClass({
         if (this.refs.numberInput.getDOMNode().value === '+') {
             this.setState({ formattedNumber: '+' + this.state.selectedCountry.dialCode });
         }
+        if (isFunction(this.props.onFocus)) {
+            this.props.onFocus.apply(this, arguments);
+        }
     },
     _getHighlightCountryIndex: function _getHighlightCountryIndex(direction) {
         // had to write own function because underscore does not have findIndex. lodash has it
@@ -3489,6 +3493,7 @@ var ReactTelephoneInput = React.createClass({
             onChange: this.handleInput,
             onClick: this.handleInputClick,
             onFocus: this.handleInputFocus,
+            onBlur: this.props.onBlur,
             onKeyDown: this.handleInputKeyDown,
             value: this.state.formattedNumber,
             ref: 'numberInput',
@@ -3507,5 +3512,5 @@ var ReactTelephoneInput = React.createClass({
 module.exports = ReactTelephoneInput;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./country_data":85,"lodash/array/findIndex":2,"lodash/array/first":3,"lodash/array/rest":5,"lodash/collection/any":6,"lodash/collection/filter":7,"lodash/collection/findWhere":9,"lodash/collection/map":10,"lodash/collection/reduce":11,"lodash/collection/some":12,"lodash/function/debounce":14,"lodash/function/memoize":15,"lodash/string/startsWith":81,"lodash/string/trim":82,"react-onclickoutside":undefined}]},{},[86])(86)
+},{"./country_data":85,"lodash/array/findIndex":2,"lodash/array/first":3,"lodash/array/rest":5,"lodash/collection/any":6,"lodash/collection/filter":7,"lodash/collection/findWhere":9,"lodash/collection/map":10,"lodash/collection/reduce":11,"lodash/collection/some":12,"lodash/function/debounce":14,"lodash/function/memoize":15,"lodash/lang/isFunction":74,"lodash/string/startsWith":81,"lodash/string/trim":82,"react-onclickoutside":undefined}]},{},[86])(86)
 });

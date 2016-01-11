@@ -13,6 +13,7 @@ var first = require('lodash/array/first');
 var rest = require('lodash/array/rest');
 var debounce = require('lodash/function/debounce');
 var memoize = require('lodash/function/memoize');
+var isFunction = require('lodash/lang/isFunction');
 // import lodash string methods
 var trim = require('lodash/string/trim');
 var startsWith = require('lodash/string/startsWith');
@@ -338,6 +339,9 @@ var ReactTelephoneInput = React.createClass({
         if(this.refs.numberInput.getDOMNode().value === '+') {
             this.setState({formattedNumber: '+' + this.state.selectedCountry.dialCode});
         }
+        if(isFunction(this.props.onFocus)) {
+          this.props.onFocus.apply(this, arguments);
+        }
     },
     _getHighlightCountryIndex(direction) {
         // had to write own function because underscore does not have findIndex. lodash has it
@@ -489,6 +493,7 @@ var ReactTelephoneInput = React.createClass({
                     onChange={this.handleInput}
                     onClick={this.handleInputClick}
                     onFocus={this.handleInputFocus}
+                    onBlur={this.props.onBlur}
                     onKeyDown={this.handleInputKeyDown}
                     value={this.state.formattedNumber}
                     ref="numberInput"

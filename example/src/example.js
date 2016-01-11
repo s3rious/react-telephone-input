@@ -7,7 +7,11 @@ var App = React.createClass({
     render() {
         return (
             <div>
-                <ReactTelephoneInput defaultCountry='ru' />
+                <ReactTelephoneInput
+                  defaultCountry='ru'
+                  onFocus={ function () { console.log('focus', arguments); } }
+                  onBlur={ function () { console.log('blur', arguments); } }
+                />
             </div>
         );
     }

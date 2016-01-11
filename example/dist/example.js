@@ -8,7 +8,15 @@ var App = React.createClass({
     displayName: 'App',
 
     render: function render() {
-        return React.createElement('div', null, React.createElement(ReactTelephoneInput, { defaultCountry: 'ru' }));
+        return React.createElement('div', null, React.createElement(ReactTelephoneInput, {
+            defaultCountry: 'ru',
+            onFocus: function onFocus() {
+                console.log('focus', arguments);
+            },
+            onBlur: function onBlur() {
+                console.log('blur', arguments);
+            }
+        }));
     }
 });
 
