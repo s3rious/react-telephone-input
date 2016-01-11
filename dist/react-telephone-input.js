@@ -3139,7 +3139,7 @@ var ReactTelephoneInput = React.createClass({
     componentDidMount: function componentDidMount() {
         document.addEventListener('keydown', this.handleKeydown);
 
-        this._cursorToEnd(false);
+        this._cursorToEnd(true);
         if (typeof this.props.onChange === 'function') {
             this.props.onChange(this.state.formattedNumber);
         }
@@ -3219,18 +3219,17 @@ var ReactTelephoneInput = React.createClass({
     },
 
     // put the cursor to the end of the input (usually after a focus event)
-    _cursorToEnd: function _cursorToEnd() {
-        var focus = arguments.length <= 0 || arguments[0] === undefined ? true : arguments[0];
-
+    _cursorToEnd: function _cursorToEnd(skipFocus) {
         var input = this.refs.numberInput.getDOMNode();
-        if (focus) {
-            input.focus();
-        } else {
+        if (skipFocus) {
             this.handleInputFocus();
-        }
-        if (isModernBrowser) {
-            var len = input.value.length;
-            input.setSelectionRange(len, len);
+        } else {
+            input.focus();
+
+            if (isModernBrowser) {
+                var len = input.value.length;
+                input.setSelectionRange(len, len);
+            }
         }
     },
     // memoize results based on the first 5/6 characters. That is all that matters
