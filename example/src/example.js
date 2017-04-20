@@ -1,20 +1,18 @@
 'use strict';
 
-var React = require('react');
-var ReactTelephoneInput = require('react-telephone-input');
+import React from 'react'
+import ReactDOM from 'react-dom'
+import ReactTelephoneInput from 'react-telephone-input'
 
+console.log('ReactTelephoneInput: ', ReactTelephoneInput);
 var App = React.createClass({
     render() {
         return (
             <div>
-                <ReactTelephoneInput
-                  defaultCountry='ru'
-                  onFocus={ function () { console.log('focus', arguments); } }
-                  onBlur={ function () { console.log('blur', arguments); } }
-                />
+                <ReactTelephoneInput defaultCountry='us' preferredCountries={['us', 'ca', 'zz', 'hk']} />
             </div>
         );
     }
 });
 
-React.render(<App />, document.getElementById('app'));
+ReactDOM.render(<App />, document.getElementById('app'));

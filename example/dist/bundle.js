@@ -39,7 +39,7 @@ function drop(array, n, guard) {
 
 module.exports = drop;
 
-},{"../internal/baseSlice":38,"../internal/isIterateeCall":57}],2:[function(require,module,exports){
+},{"../internal/baseSlice":41,"../internal/isIterateeCall":61}],2:[function(require,module,exports){
 var createFindIndex = require('../internal/createFindIndex');
 
 /**
@@ -94,7 +94,7 @@ var findIndex = createFindIndex();
 
 module.exports = findIndex;
 
-},{"../internal/createFindIndex":47}],3:[function(require,module,exports){
+},{"../internal/createFindIndex":51}],3:[function(require,module,exports){
 /**
  * Gets the first element of `array`.
  *
@@ -163,9 +163,6 @@ function rest(array) {
 module.exports = rest;
 
 },{"./drop":1}],6:[function(require,module,exports){
-module.exports = require('./some');
-
-},{"./some":12}],7:[function(require,module,exports){
 var arrayFilter = require('../internal/arrayFilter'),
     baseCallback = require('../internal/baseCallback'),
     baseFilter = require('../internal/baseFilter'),
@@ -228,7 +225,7 @@ function filter(collection, predicate, thisArg) {
 
 module.exports = filter;
 
-},{"../internal/arrayFilter":17,"../internal/baseCallback":21,"../internal/baseFilter":23,"../lang/isArray":73}],8:[function(require,module,exports){
+},{"../internal/arrayFilter":17,"../internal/baseCallback":23,"../internal/baseFilter":26,"../lang/isArray":77}],7:[function(require,module,exports){
 var baseEach = require('../internal/baseEach'),
     createFind = require('../internal/createFind');
 
@@ -286,7 +283,7 @@ var find = createFind(baseEach);
 
 module.exports = find;
 
-},{"../internal/baseEach":22,"../internal/createFind":46}],9:[function(require,module,exports){
+},{"../internal/baseEach":25,"../internal/createFind":50}],8:[function(require,module,exports){
 var baseMatches = require('../internal/baseMatches'),
     find = require('./find');
 
@@ -325,7 +322,7 @@ function findWhere(collection, source) {
 
 module.exports = findWhere;
 
-},{"../internal/baseMatches":33,"./find":8}],10:[function(require,module,exports){
+},{"../internal/baseMatches":36,"./find":7}],9:[function(require,module,exports){
 var arrayMap = require('../internal/arrayMap'),
     baseCallback = require('../internal/baseCallback'),
     baseMap = require('../internal/baseMap'),
@@ -395,7 +392,7 @@ function map(collection, iteratee, thisArg) {
 
 module.exports = map;
 
-},{"../internal/arrayMap":18,"../internal/baseCallback":21,"../internal/baseMap":32,"../lang/isArray":73}],11:[function(require,module,exports){
+},{"../internal/arrayMap":18,"../internal/baseCallback":23,"../internal/baseMap":35,"../lang/isArray":77}],10:[function(require,module,exports){
 var arrayReduce = require('../internal/arrayReduce'),
     baseEach = require('../internal/baseEach'),
     createReduce = require('../internal/createReduce');
@@ -441,7 +438,7 @@ var reduce = createReduce(arrayReduce, baseEach);
 
 module.exports = reduce;
 
-},{"../internal/arrayReduce":19,"../internal/baseEach":22,"../internal/createReduce":48}],12:[function(require,module,exports){
+},{"../internal/arrayReduce":19,"../internal/baseEach":25,"../internal/createReduce":52}],11:[function(require,module,exports){
 var arraySome = require('../internal/arraySome'),
     baseCallback = require('../internal/baseCallback'),
     baseSome = require('../internal/baseSome'),
@@ -510,7 +507,7 @@ function some(collection, predicate, thisArg) {
 
 module.exports = some;
 
-},{"../internal/arraySome":20,"../internal/baseCallback":21,"../internal/baseSome":39,"../internal/isIterateeCall":57,"../lang/isArray":73}],13:[function(require,module,exports){
+},{"../internal/arraySome":20,"../internal/baseCallback":23,"../internal/baseSome":42,"../internal/isIterateeCall":61,"../lang/isArray":77}],12:[function(require,module,exports){
 var getNative = require('../internal/getNative');
 
 /* Native method references for those with the same name as other `lodash` methods. */
@@ -536,7 +533,7 @@ var now = nativeNow || function() {
 
 module.exports = now;
 
-},{"../internal/getNative":54}],14:[function(require,module,exports){
+},{"../internal/getNative":58}],13:[function(require,module,exports){
 var isObject = require('../lang/isObject'),
     now = require('../date/now');
 
@@ -719,7 +716,7 @@ function debounce(func, wait, options) {
 
 module.exports = debounce;
 
-},{"../date/now":13,"../lang/isObject":76}],15:[function(require,module,exports){
+},{"../date/now":12,"../lang/isObject":81}],14:[function(require,module,exports){
 var MapCache = require('../internal/MapCache');
 
 /** Used as the `TypeError` message for "Functions" methods. */
@@ -801,7 +798,67 @@ memoize.Cache = MapCache;
 
 module.exports = memoize;
 
-},{"../internal/MapCache":16}],16:[function(require,module,exports){
+},{"../internal/MapCache":16}],15:[function(require,module,exports){
+/** Used as the `TypeError` message for "Functions" methods. */
+var FUNC_ERROR_TEXT = 'Expected a function';
+
+/* Native method references for those with the same name as other `lodash` methods. */
+var nativeMax = Math.max;
+
+/**
+ * Creates a function that invokes `func` with the `this` binding of the
+ * created function and arguments from `start` and beyond provided as an array.
+ *
+ * **Note:** This method is based on the [rest parameter](https://developer.mozilla.org/Web/JavaScript/Reference/Functions/rest_parameters).
+ *
+ * @static
+ * @memberOf _
+ * @category Function
+ * @param {Function} func The function to apply a rest parameter to.
+ * @param {number} [start=func.length-1] The start position of the rest parameter.
+ * @returns {Function} Returns the new function.
+ * @example
+ *
+ * var say = _.restParam(function(what, names) {
+ *   return what + ' ' + _.initial(names).join(', ') +
+ *     (_.size(names) > 1 ? ', & ' : '') + _.last(names);
+ * });
+ *
+ * say('hello', 'fred', 'barney', 'pebbles');
+ * // => 'hello fred, barney, & pebbles'
+ */
+function restParam(func, start) {
+  if (typeof func != 'function') {
+    throw new TypeError(FUNC_ERROR_TEXT);
+  }
+  start = nativeMax(start === undefined ? (func.length - 1) : (+start || 0), 0);
+  return function() {
+    var args = arguments,
+        index = -1,
+        length = nativeMax(args.length - start, 0),
+        rest = Array(length);
+
+    while (++index < length) {
+      rest[index] = args[start + index];
+    }
+    switch (start) {
+      case 0: return func.call(this, rest);
+      case 1: return func.call(this, args[0], rest);
+      case 2: return func.call(this, args[0], args[1], rest);
+    }
+    var otherArgs = Array(start + 1);
+    index = -1;
+    while (++index < start) {
+      otherArgs[index] = args[index];
+    }
+    otherArgs[start] = rest;
+    return func.apply(this, otherArgs);
+  };
+}
+
+module.exports = restParam;
+
+},{}],16:[function(require,module,exports){
 var mapDelete = require('./mapDelete'),
     mapGet = require('./mapGet'),
     mapHas = require('./mapHas'),
@@ -827,7 +884,7 @@ MapCache.prototype.set = mapSet;
 
 module.exports = MapCache;
 
-},{"./mapDelete":63,"./mapGet":64,"./mapHas":65,"./mapSet":66}],17:[function(require,module,exports){
+},{"./mapDelete":67,"./mapGet":68,"./mapHas":69,"./mapSet":70}],17:[function(require,module,exports){
 /**
  * A specialized version of `_.filter` for arrays without support for callback
  * shorthands and `this` binding.
@@ -931,6 +988,61 @@ function arraySome(array, predicate) {
 module.exports = arraySome;
 
 },{}],21:[function(require,module,exports){
+var keys = require('../object/keys');
+
+/**
+ * A specialized version of `_.assign` for customizing assigned values without
+ * support for argument juggling, multiple sources, and `this` binding `customizer`
+ * functions.
+ *
+ * @private
+ * @param {Object} object The destination object.
+ * @param {Object} source The source object.
+ * @param {Function} customizer The function to customize assigned values.
+ * @returns {Object} Returns `object`.
+ */
+function assignWith(object, source, customizer) {
+  var index = -1,
+      props = keys(source),
+      length = props.length;
+
+  while (++index < length) {
+    var key = props[index],
+        value = object[key],
+        result = customizer(value, source[key], key, object, source);
+
+    if ((result === result ? (result !== value) : (value === value)) ||
+        (value === undefined && !(key in object))) {
+      object[key] = result;
+    }
+  }
+  return object;
+}
+
+module.exports = assignWith;
+
+},{"../object/keys":84}],22:[function(require,module,exports){
+var baseCopy = require('./baseCopy'),
+    keys = require('../object/keys');
+
+/**
+ * The base implementation of `_.assign` without support for argument juggling,
+ * multiple sources, and `customizer` functions.
+ *
+ * @private
+ * @param {Object} object The destination object.
+ * @param {Object} source The source object.
+ * @returns {Object} Returns `object`.
+ */
+function baseAssign(object, source) {
+  return source == null
+    ? object
+    : baseCopy(source, keys(source), object);
+}
+
+module.exports = baseAssign;
+
+},{"../object/keys":84,"./baseCopy":24}],23:[function(require,module,exports){
 var baseMatches = require('./baseMatches'),
     baseMatchesProperty = require('./baseMatchesProperty'),
     bindCallback = require('./bindCallback'),
@@ -967,7 +1079,32 @@ function baseCallback(func, thisArg, argCount) {
 
 module.exports = baseCallback;
 
-},{"../utility/identity":83,"../utility/property":84,"./baseMatches":33,"./baseMatchesProperty":34,"./bindCallback":41}],22:[function(require,module,exports){
+},{"../utility/identity":89,"../utility/property":90,"./baseMatches":36,"./baseMatchesProperty":37,"./bindCallback":44}],24:[function(require,module,exports){
+/**
+ * Copies properties of `source` to `object`.
+ *
+ * @private
+ * @param {Object} source The object to copy properties from.
+ * @param {Array} props The property names to copy.
+ * @param {Object} [object={}] The object to copy properties to.
+ * @returns {Object} Returns `object`.
+ */
+function baseCopy(source, props, object) {
+  object || (object = {});
+
+  var index = -1,
+      length = props.length;
+
+  while (++index < length) {
+    var key = props[index];
+    object[key] = source[key];
+  }
+  return object;
+}
+
+module.exports = baseCopy;
+
+},{}],25:[function(require,module,exports){
 var baseForOwn = require('./baseForOwn'),
     createBaseEach = require('./createBaseEach');
 
@@ -984,7 +1121,7 @@ var baseEach = createBaseEach(baseForOwn);
 
 module.exports = baseEach;
 
-},{"./baseForOwn":27,"./createBaseEach":44}],23:[function(require,module,exports){
+},{"./baseForOwn":30,"./createBaseEach":48}],26:[function(require,module,exports){
 var baseEach = require('./baseEach');
 
 /**
@@ -1079,7 +1216,7 @@ var baseFor = createBaseFor();
 
 module.exports = baseFor;
 
-},{"./createBaseFor":45}],27:[function(require,module,exports){
+},{"./createBaseFor":49}],30:[function(require,module,exports){
 var baseFor = require('./baseFor'),
     keys = require('../object/keys');
 
@@ -1098,7 +1235,7 @@ function baseForOwn(object, iteratee) {
 
 module.exports = baseForOwn;
 
-},{"../object/keys":78,"./baseFor":26}],28:[function(require,module,exports){
+},{"../object/keys":84,"./baseFor":29}],31:[function(require,module,exports){
 var toObject = require('./toObject');
 
 /**
@@ -1129,7 +1266,7 @@ function baseGet(object, path, pathKey) {
 
 module.exports = baseGet;
 
-},{"./toObject":68}],29:[function(require,module,exports){
+},{"./toObject":72}],32:[function(require,module,exports){
 var baseIsEqualDeep = require('./baseIsEqualDeep'),
     isObject = require('../lang/isObject'),
     isObjectLike = require('./isObjectLike');
@@ -1159,7 +1296,7 @@ function baseIsEqual(value, other, customizer, isLoose, stackA, stackB) {
 
 module.exports = baseIsEqual;
 
-},{"../lang/isObject":76,"./baseIsEqualDeep":30,"./isObjectLike":60}],30:[function(require,module,exports){
+},{"../lang/isObject":81,"./baseIsEqualDeep":33,"./isObjectLike":64}],33:[function(require,module,exports){
 var equalArrays = require('./equalArrays'),
     equalByTag = require('./equalByTag'),
     equalObjects = require('./equalObjects'),
@@ -1263,7 +1400,7 @@ function baseIsEqualDeep(object, other, equalFunc, customizer, isLoose, stackA, 
 
 module.exports = baseIsEqualDeep;
 
-},{"../lang/isArray":73,"../lang/isTypedArray":77,"./equalArrays":49,"./equalByTag":50,"./equalObjects":51}],31:[function(require,module,exports){
+},{"../lang/isArray":77,"../lang/isTypedArray":82,"./equalArrays":53,"./equalByTag":54,"./equalObjects":55}],34:[function(require,module,exports){
 var baseIsEqual = require('./baseIsEqual'),
     toObject = require('./toObject');
 
@@ -1317,7 +1454,7 @@ function baseIsMatch(object, matchData, customizer) {
 
 module.exports = baseIsMatch;
 
-},{"./baseIsEqual":29,"./toObject":68}],32:[function(require,module,exports){
+},{"./baseIsEqual":32,"./toObject":72}],35:[function(require,module,exports){
 var baseEach = require('./baseEach'),
     isArrayLike = require('./isArrayLike');
 
@@ -1342,7 +1479,7 @@ function baseMap(collection, iteratee) {
 
 module.exports = baseMap;
 
-},{"./baseEach":22,"./isArrayLike":55}],33:[function(require,module,exports){
+},{"./baseEach":25,"./isArrayLike":59}],36:[function(require,module,exports){
 var baseIsMatch = require('./baseIsMatch'),
     getMatchData = require('./getMatchData'),
     toObject = require('./toObject');
@@ -1374,7 +1511,7 @@ function baseMatches(source) {
 
 module.exports = baseMatches;
 
-},{"./baseIsMatch":31,"./getMatchData":53,"./toObject":68}],34:[function(require,module,exports){
+},{"./baseIsMatch":34,"./getMatchData":57,"./toObject":72}],37:[function(require,module,exports){
 var baseGet = require('./baseGet'),
     baseIsEqual = require('./baseIsEqual'),
     baseSlice = require('./baseSlice'),
@@ -1421,7 +1558,7 @@ function baseMatchesProperty(path, srcValue) {
 
 module.exports = baseMatchesProperty;
 
-},{"../array/last":4,"../lang/isArray":73,"./baseGet":28,"./baseIsEqual":29,"./baseSlice":38,"./isKey":58,"./isStrictComparable":62,"./toObject":68,"./toPath":69}],35:[function(require,module,exports){
+},{"../array/last":4,"../lang/isArray":77,"./baseGet":31,"./baseIsEqual":32,"./baseSlice":41,"./isKey":62,"./isStrictComparable":66,"./toObject":72,"./toPath":73}],38:[function(require,module,exports){
 /**
  * The base implementation of `_.property` without support for deep paths.
  *
@@ -1458,7 +1595,7 @@ function basePropertyDeep(path) {
 
 module.exports = basePropertyDeep;
 
-},{"./baseGet":28,"./toPath":69}],37:[function(require,module,exports){
+},{"./baseGet":31,"./toPath":73}],40:[function(require,module,exports){
 /**
  * The base implementation of `_.reduce` and `_.reduceRight` without support
  * for callback shorthands and `this` binding, which iterates over `collection`
@@ -1599,7 +1736,7 @@ function bindCallback(func, thisArg, argCount) {
 
 module.exports = bindCallback;
 
-},{"../utility/identity":83}],42:[function(require,module,exports){
+},{"../utility/identity":89}],45:[function(require,module,exports){
 /**
  * Used by `_.trim` and `_.trimLeft` to get the index of the first character
  * of `string` that is not found in `chars`.
@@ -1638,7 +1775,50 @@ function charsRightIndex(string, chars) {
 
 module.exports = charsRightIndex;
 
-},{}],44:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
+var bindCallback = require('./bindCallback'),
+    isIterateeCall = require('./isIterateeCall'),
+    restParam = require('../function/restParam');
+
+/**
+ * Creates a `_.assign`, `_.defaults`, or `_.merge` function.
+ *
+ * @private
+ * @param {Function} assigner The function to assign values.
+ * @returns {Function} Returns the new assigner function.
+ */
+function createAssigner(assigner) {
+  return restParam(function(object, sources) {
+    var index = -1,
+        length = object == null ? 0 : sources.length,
+        customizer = length > 2 ? sources[length - 2] : undefined,
+        guard = length > 2 ? sources[2] : undefined,
+        thisArg = length > 1 ? sources[length - 1] : undefined;
+
+    if (typeof customizer == 'function') {
+      customizer = bindCallback(customizer, thisArg, 5);
+      length -= 2;
+    } else {
+      customizer = typeof thisArg == 'function' ? thisArg : undefined;
+      length -= (customizer ? 1 : 0);
+    }
+    if (guard && isIterateeCall(sources[0], sources[1], guard)) {
+      customizer = length < 3 ? undefined : customizer;
+      length = 1;
+    }
+    while (++index < length) {
+      var source = sources[index];
+      if (source) {
+        assigner(object, source, customizer);
+      }
+    }
+    return object;
+  });
+}
+
+module.exports = createAssigner;
+
+},{"../function/restParam":15,"./bindCallback":44,"./isIterateeCall":61}],48:[function(require,module,exports){
 var getLength = require('./getLength'),
     isLength = require('./isLength'),
     toObject = require('./toObject');
@@ -1671,7 +1851,7 @@ function createBaseEach(eachFunc, fromRight) {
 
 module.exports = createBaseEach;
 
-},{"./getLength":52,"./isLength":59,"./toObject":68}],45:[function(require,module,exports){
+},{"./getLength":56,"./isLength":63,"./toObject":72}],49:[function(require,module,exports){
 var toObject = require('./toObject');
 
 /**
@@ -1700,7 +1880,7 @@ function createBaseFor(fromRight) {
 
 module.exports = createBaseFor;
 
-},{"./toObject":68}],46:[function(require,module,exports){
+},{"./toObject":72}],50:[function(require,module,exports){
 var baseCallback = require('./baseCallback'),
     baseFind = require('./baseFind'),
     baseFindIndex = require('./baseFindIndex'),
@@ -1727,7 +1907,7 @@ function createFind(eachFunc, fromRight) {
 
 module.exports = createFind;
 
-},{"../lang/isArray":73,"./baseCallback":21,"./baseFind":24,"./baseFindIndex":25}],47:[function(require,module,exports){
+},{"../lang/isArray":77,"./baseCallback":23,"./baseFind":27,"./baseFindIndex":28}],51:[function(require,module,exports){
 var baseCallback = require('./baseCallback'),
     baseFindIndex = require('./baseFindIndex');
 
@@ -1750,7 +1930,7 @@ function createFindIndex(fromRight) {
 
 module.exports = createFindIndex;
 
-},{"./baseCallback":21,"./baseFindIndex":25}],48:[function(require,module,exports){
+},{"./baseCallback":23,"./baseFindIndex":28}],52:[function(require,module,exports){
 var baseCallback = require('./baseCallback'),
     baseReduce = require('./baseReduce'),
     isArray = require('../lang/isArray');
@@ -1774,7 +1954,7 @@ function createReduce(arrayFunc, eachFunc) {
 
 module.exports = createReduce;
 
-},{"../lang/isArray":73,"./baseCallback":21,"./baseReduce":37}],49:[function(require,module,exports){
+},{"../lang/isArray":77,"./baseCallback":23,"./baseReduce":40}],53:[function(require,module,exports){
 var arraySome = require('./arraySome');
 
 /**
@@ -1827,7 +2007,7 @@ function equalArrays(array, other, equalFunc, customizer, isLoose, stackA, stack
 
 module.exports = equalArrays;
 
-},{"./arraySome":20}],50:[function(require,module,exports){
+},{"./arraySome":20}],54:[function(require,module,exports){
 /** `Object#toString` result references. */
 var boolTag = '[object Boolean]',
     dateTag = '[object Date]',
@@ -1877,7 +2057,7 @@ function equalByTag(object, other, tag) {
 
 module.exports = equalByTag;
 
-},{}],51:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 var keys = require('../object/keys');
 
 /** Used for native method references. */
@@ -1946,7 +2126,7 @@ function equalObjects(object, other, equalFunc, customizer, isLoose, stackA, sta
 
 module.exports = equalObjects;
 
-},{"../object/keys":78}],52:[function(require,module,exports){
+},{"../object/keys":84}],56:[function(require,module,exports){
 var baseProperty = require('./baseProperty');
 
 /**
@@ -1963,7 +2143,7 @@ var getLength = baseProperty('length');
 
 module.exports = getLength;
 
-},{"./baseProperty":35}],53:[function(require,module,exports){
+},{"./baseProperty":38}],57:[function(require,module,exports){
 var isStrictComparable = require('./isStrictComparable'),
     pairs = require('../object/pairs');
 
@@ -1986,7 +2166,7 @@ function getMatchData(object) {
 
 module.exports = getMatchData;
 
-},{"../object/pairs":80,"./isStrictComparable":62}],54:[function(require,module,exports){
+},{"../object/pairs":86,"./isStrictComparable":66}],58:[function(require,module,exports){
 var isNative = require('../lang/isNative');
 
 /**
@@ -2004,7 +2184,7 @@ function getNative(object, key) {
 
 module.exports = getNative;
 
-},{"../lang/isNative":75}],55:[function(require,module,exports){
+},{"../lang/isNative":80}],59:[function(require,module,exports){
 var getLength = require('./getLength'),
     isLength = require('./isLength');
 
@@ -2021,7 +2201,7 @@ function isArrayLike(value) {
 
 module.exports = isArrayLike;
 
-},{"./getLength":52,"./isLength":59}],56:[function(require,module,exports){
+},{"./getLength":56,"./isLength":63}],60:[function(require,module,exports){
 /** Used to detect unsigned integer values. */
 var reIsUint = /^\d+$/;
 
@@ -2047,7 +2227,7 @@ function isIndex(value, length) {
 
 module.exports = isIndex;
 
-},{}],57:[function(require,module,exports){
+},{}],61:[function(require,module,exports){
 var isArrayLike = require('./isArrayLike'),
     isIndex = require('./isIndex'),
     isObject = require('../lang/isObject');
@@ -2077,7 +2257,7 @@ function isIterateeCall(value, index, object) {
 
 module.exports = isIterateeCall;
 
-},{"../lang/isObject":76,"./isArrayLike":55,"./isIndex":56}],58:[function(require,module,exports){
+},{"../lang/isObject":81,"./isArrayLike":59,"./isIndex":60}],62:[function(require,module,exports){
 var isArray = require('../lang/isArray'),
     toObject = require('./toObject');
 
@@ -2107,7 +2287,7 @@ function isKey(value, object) {
 
 module.exports = isKey;
 
-},{"../lang/isArray":73,"./toObject":68}],59:[function(require,module,exports){
+},{"../lang/isArray":77,"./toObject":72}],63:[function(require,module,exports){
 /**
  * Used as the [maximum length](http://ecma-international.org/ecma-262/6.0/#sec-number.max_safe_integer)
  * of an array-like value.
@@ -2129,7 +2309,7 @@ function isLength(value) {
 
 module.exports = isLength;
 
-},{}],60:[function(require,module,exports){
+},{}],64:[function(require,module,exports){
 /**
  * Checks if `value` is object-like.
  *
@@ -2143,7 +2323,7 @@ function isObjectLike(value) {
 
 module.exports = isObjectLike;
 
-},{}],61:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
 /**
  * Used by `trimmedLeftIndex` and `trimmedRightIndex` to determine if a
  * character code is whitespace.
@@ -2159,7 +2339,7 @@ function isSpace(charCode) {
 
 module.exports = isSpace;
 
-},{}],62:[function(require,module,exports){
+},{}],66:[function(require,module,exports){
 var isObject = require('../lang/isObject');
 
 /**
@@ -2176,7 +2356,7 @@ function isStrictComparable(value) {
 
 module.exports = isStrictComparable;
 
-},{"../lang/isObject":76}],63:[function(require,module,exports){
+},{"../lang/isObject":81}],67:[function(require,module,exports){
 /**
  * Removes `key` and its value from the cache.
  *
@@ -2192,7 +2372,7 @@ function mapDelete(key) {
 
 module.exports = mapDelete;
 
-},{}],64:[function(require,module,exports){
+},{}],68:[function(require,module,exports){
 /**
  * Gets the cached value for `key`.
  *
@@ -2208,7 +2388,7 @@ function mapGet(key) {
 
 module.exports = mapGet;
 
-},{}],65:[function(require,module,exports){
+},{}],69:[function(require,module,exports){
 /** Used for native method references. */
 var objectProto = Object.prototype;
 
@@ -2230,7 +2410,7 @@ function mapHas(key) {
 
 module.exports = mapHas;
 
-},{}],66:[function(require,module,exports){
+},{}],70:[function(require,module,exports){
 /**
  * Sets `value` to `key` of the cache.
  *
@@ -2250,7 +2430,7 @@ function mapSet(key, value) {
 
 module.exports = mapSet;
 
-},{}],67:[function(require,module,exports){
+},{}],71:[function(require,module,exports){
 var isArguments = require('../lang/isArguments'),
     isArray = require('../lang/isArray'),
     isIndex = require('./isIndex'),
@@ -2293,7 +2473,7 @@ function shimKeys(object) {
 
 module.exports = shimKeys;
 
-},{"../lang/isArguments":72,"../lang/isArray":73,"../object/keysIn":79,"./isIndex":56,"./isLength":59}],68:[function(require,module,exports){
+},{"../lang/isArguments":76,"../lang/isArray":77,"../object/keysIn":85,"./isIndex":60,"./isLength":63}],72:[function(require,module,exports){
 var isObject = require('../lang/isObject');
 
 /**
@@ -2309,7 +2489,7 @@ function toObject(value) {
 
 module.exports = toObject;
 
-},{"../lang/isObject":76}],69:[function(require,module,exports){
+},{"../lang/isObject":81}],73:[function(require,module,exports){
 var baseToString = require('./baseToString'),
     isArray = require('../lang/isArray');
 
@@ -2339,7 +2519,7 @@ function toPath(value) {
 
 module.exports = toPath;
 
-},{"../lang/isArray":73,"./baseToString":40}],70:[function(require,module,exports){
+},{"../lang/isArray":77,"./baseToString":43}],74:[function(require,module,exports){
 var isSpace = require('./isSpace');
 
 /**
@@ -2360,7 +2540,7 @@ function trimmedLeftIndex(string) {
 
 module.exports = trimmedLeftIndex;
 
-},{"./isSpace":61}],71:[function(require,module,exports){
+},{"./isSpace":65}],75:[function(require,module,exports){
 var isSpace = require('./isSpace');
 
 /**
@@ -2380,7 +2560,7 @@ function trimmedRightIndex(string) {
 
 module.exports = trimmedRightIndex;
 
-},{"./isSpace":61}],72:[function(require,module,exports){
+},{"./isSpace":65}],76:[function(require,module,exports){
 var isArrayLike = require('../internal/isArrayLike'),
     isObjectLike = require('../internal/isObjectLike');
 
@@ -2416,7 +2596,7 @@ function isArguments(value) {
 
 module.exports = isArguments;
 
-},{"../internal/isArrayLike":55,"../internal/isObjectLike":60}],73:[function(require,module,exports){
+},{"../internal/isArrayLike":59,"../internal/isObjectLike":64}],77:[function(require,module,exports){
 var getNative = require('../internal/getNative'),
     isLength = require('../internal/isLength'),
     isObjectLike = require('../internal/isObjectLike');
@@ -2458,7 +2638,63 @@ var isArray = nativeIsArray || function(value) {
 
 module.exports = isArray;
 
-},{"../internal/getNative":54,"../internal/isLength":59,"../internal/isObjectLike":60}],74:[function(require,module,exports){
+},{"../internal/getNative":58,"../internal/isLength":63,"../internal/isObjectLike":64}],78:[function(require,module,exports){
+var baseIsEqual = require('../internal/baseIsEqual'),
+    bindCallback = require('../internal/bindCallback');
+
+/**
+ * Performs a deep comparison between two values to determine if they are
+ * equivalent. If `customizer` is provided it's invoked to compare values.
+ * If `customizer` returns `undefined` comparisons are handled by the method
+ * instead. The `customizer` is bound to `thisArg` and invoked with up to
+ * three arguments: (value, other [, index|key]).
+ *
+ * **Note:** This method supports comparing arrays, booleans, `Date` objects,
+ * numbers, `Object` objects, regexes, and strings. Objects are compared by
+ * their own, not inherited, enumerable properties. Functions and DOM nodes
+ * are **not** supported. Provide a customizer function to extend support
+ * for comparing other values.
+ *
+ * @static
+ * @memberOf _
+ * @alias eq
+ * @category Lang
+ * @param {*} value The value to compare.
+ * @param {*} other The other value to compare.
+ * @param {Function} [customizer] The function to customize value comparisons.
+ * @param {*} [thisArg] The `this` binding of `customizer`.
+ * @returns {boolean} Returns `true` if the values are equivalent, else `false`.
+ * @example
+ *
+ * var object = { 'user': 'fred' };
+ * var other = { 'user': 'fred' };
+ *
+ * object == other;
+ * // => false
+ *
+ * _.isEqual(object, other);
+ * // => true
+ *
+ * // using a customizer callback
+ * var array = ['hello', 'goodbye'];
+ * var other = ['hi', 'goodbye'];
+ *
+ * _.isEqual(array, other, function(value, other) {
+ *   if (_.every([value, other], RegExp.prototype.test, /^h(?:i|ello)$/)) {
+ *     return true;
+ *   }
+ * });
+ * // => true
+ */
+function isEqual(value, other, customizer, thisArg) {
+  customizer = typeof customizer == 'function' ? bindCallback(customizer, thisArg, 3) : undefined;
+  var result = customizer ? customizer(value, other) : undefined;
+  return  result === undefined ? baseIsEqual(value, other, customizer) : !!result;
+}
+
+module.exports = isEqual;
+
+},{"../internal/baseIsEqual":32,"../internal/bindCallback":44}],79:[function(require,module,exports){
 var isObject = require('./isObject');
 
 /** `Object#toString` result references. */
@@ -2498,7 +2734,7 @@ function isFunction(value) {
 
 module.exports = isFunction;
 
-},{"./isObject":76}],75:[function(require,module,exports){
+},{"./isObject":81}],80:[function(require,module,exports){
 var isFunction = require('./isFunction'),
     isObjectLike = require('../internal/isObjectLike');
 
@@ -2548,7 +2784,7 @@ function isNative(value) {
 
 module.exports = isNative;
 
-},{"../internal/isObjectLike":60,"./isFunction":74}],76:[function(require,module,exports){
+},{"../internal/isObjectLike":64,"./isFunction":79}],81:[function(require,module,exports){
 /**
  * Checks if `value` is the [language type](https://es5.github.io/#x8) of `Object`.
  * (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
@@ -2578,7 +2814,7 @@ function isObject(value) {
 
 module.exports = isObject;
 
-},{}],77:[function(require,module,exports){
+},{}],82:[function(require,module,exports){
 var isLength = require('../internal/isLength'),
     isObjectLike = require('../internal/isObjectLike');
 
@@ -2654,7 +2890,52 @@ function isTypedArray(value) {
 
 module.exports = isTypedArray;
 
-},{"../internal/isLength":59,"../internal/isObjectLike":60}],78:[function(require,module,exports){
+},{"../internal/isLength":63,"../internal/isObjectLike":64}],83:[function(require,module,exports){
+var assignWith = require('../internal/assignWith'),
+    baseAssign = require('../internal/baseAssign'),
+    createAssigner = require('../internal/createAssigner');
+
+/**
+ * Assigns own enumerable properties of source object(s) to the destination
+ * object. Subsequent sources overwrite property assignments of previous sources.
+ * If `customizer` is provided it's invoked to produce the assigned values.
+ * The `customizer` is bound to `thisArg` and invoked with five arguments:
+ * (objectValue, sourceValue, key, object, source).
+ *
+ * **Note:** This method mutates `object` and is based on
+ * [`Object.assign`](http://ecma-international.org/ecma-262/6.0/#sec-object.assign).
+ *
+ * @static
+ * @memberOf _
+ * @alias extend
+ * @category Object
+ * @param {Object} object The destination object.
+ * @param {...Object} [sources] The source objects.
+ * @param {Function} [customizer] The function to customize assigned values.
+ * @param {*} [thisArg] The `this` binding of `customizer`.
+ * @returns {Object} Returns `object`.
+ * @example
+ *
+ * _.assign({ 'user': 'barney' }, { 'age': 40 }, { 'user': 'fred' });
+ * // => { 'user': 'fred', 'age': 40 }
+ *
+ * // using a customizer callback
+ * var defaults = _.partialRight(_.assign, function(value, other) {
+ *   return _.isUndefined(value) ? other : value;
+ * });
+ *
+ * defaults({ 'user': 'barney' }, { 'age': 36 }, { 'user': 'fred' });
+ * // => { 'user': 'barney', 'age': 36 }
+ */
+var assign = createAssigner(function(object, source, customizer) {
+  return customizer
+    ? assignWith(object, source, customizer)
+    : baseAssign(object, source);
+});
+
+module.exports = assign;
+
+},{"../internal/assignWith":21,"../internal/baseAssign":22,"../internal/createAssigner":47}],84:[function(require,module,exports){
 var getNative = require('../internal/getNative'),
     isArrayLike = require('../internal/isArrayLike'),
     isObject = require('../lang/isObject'),
@@ -2701,7 +2982,7 @@ var keys = !nativeKeys ? shimKeys : function(object) {
 
 module.exports = keys;
 
-},{"../internal/getNative":54,"../internal/isArrayLike":55,"../internal/shimKeys":67,"../lang/isObject":76}],79:[function(require,module,exports){
+},{"../internal/getNative":58,"../internal/isArrayLike":59,"../internal/shimKeys":71,"../lang/isObject":81}],85:[function(require,module,exports){
 var isArguments = require('../lang/isArguments'),
     isArray = require('../lang/isArray'),
     isIndex = require('../internal/isIndex'),
@@ -2767,7 +3048,7 @@ function keysIn(object) {
 
 module.exports = keysIn;
 
-},{"../internal/isIndex":56,"../internal/isLength":59,"../lang/isArguments":72,"../lang/isArray":73,"../lang/isObject":76}],80:[function(require,module,exports){
+},{"../internal/isIndex":60,"../internal/isLength":63,"../lang/isArguments":76,"../lang/isArray":77,"../lang/isObject":81}],86:[function(require,module,exports){
 var keys = require('./keys'),
     toObject = require('../internal/toObject');
 
@@ -2802,7 +3083,7 @@ function pairs(object) {
 
 module.exports = pairs;
 
-},{"../internal/toObject":68,"./keys":78}],81:[function(require,module,exports){
+},{"../internal/toObject":72,"./keys":84}],87:[function(require,module,exports){
 var baseToString = require('../internal/baseToString');
 
 /* Native method references for those with the same name as other `lodash` methods. */
@@ -2840,7 +3121,7 @@ function startsWith(string, target, position) {
 
 module.exports = startsWith;
 
-},{"../internal/baseToString":40}],82:[function(require,module,exports){
+},{"../internal/baseToString":43}],88:[function(require,module,exports){
 var baseToString = require('../internal/baseToString'),
     charsLeftIndex = require('../internal/charsLeftIndex'),
     charsRightIndex = require('../internal/charsRightIndex'),
@@ -2884,7 +3165,7 @@ function trim(string, chars, guard) {
 
 module.exports = trim;
 
-},{"../internal/baseToString":40,"../internal/charsLeftIndex":42,"../internal/charsRightIndex":43,"../internal/isIterateeCall":57,"../internal/trimmedLeftIndex":70,"../internal/trimmedRightIndex":71}],83:[function(require,module,exports){
+},{"../internal/baseToString":43,"../internal/charsLeftIndex":45,"../internal/charsRightIndex":46,"../internal/isIterateeCall":61,"../internal/trimmedLeftIndex":74,"../internal/trimmedRightIndex":75}],89:[function(require,module,exports){
 /**
  * This method returns the first argument provided to it.
  *
@@ -2906,7 +3187,7 @@ function identity(value) {
 
 module.exports = identity;
 
-},{}],84:[function(require,module,exports){
+},{}],90:[function(require,module,exports){
 var baseProperty = require('../internal/baseProperty'),
     basePropertyDeep = require('../internal/basePropertyDeep'),
     isKey = require('../internal/isKey');
@@ -2939,72 +3220,56 @@ function property(path) {
 
 module.exports = property;
 
-},{"../internal/baseProperty":35,"../internal/basePropertyDeep":36,"../internal/isKey":58}],85:[function(require,module,exports){
+},{"../internal/baseProperty":38,"../internal/basePropertyDeep":39,"../internal/isKey":62}],91:[function(require,module,exports){
 'use strict';
 
-// So each country array has the following information:
-// [
-//    Country name,
-//    iso2 code,
-//    International dial code,
-//    Format (if available),
-//    Order (if >1 country with same dial code),
-//    Area codes (if >1 country with same dial code)
-// ]
-var allCountries = [['Afghanistan (‫افغانستان‬‎)', 'af', '93'], ['Albania (Shqipëri)', 'al', '355'], ['Algeria (‫الجزائر‬‎)', 'dz', '213'], ['American Samoa', 'as', '1684'], ['Andorra', 'ad', '376'], ['Angola', 'ao', '244'], ['Anguilla', 'ai', '1264'], ['Antigua and Barbuda', 'ag', '1268'], ['Argentina', 'ar', '54'], ['Armenia (Հայաստան)', 'am', '374'], ['Aruba', 'aw', '297'], ['Australia', 'au', '61', '+.. ... ... ...'], ['Austria (Österreich)', 'at', '43'], ['Azerbaijan (Azərbaycan)', 'az', '994'], ['Bahamas', 'bs', '1242'], ['Bahrain (‫البحرين‬‎)', 'bh', '973'], ['Bangladesh (বাংলাদেশ)', 'bd', '880'], ['Barbados', 'bb', '1246'], ['Belarus (Беларусь)', 'by', '375'], ['Belgium (België)', 'be', '32', '+.. ... .. .. ..'], ['Belize', 'bz', '501'], ['Benin (Bénin)', 'bj', '229'], ['Bermuda', 'bm', '1441'], ['Bhutan (འབྲུག)', 'bt', '975'], ['Bolivia', 'bo', '591'], ['Bosnia and Herzegovina (Босна и Херцеговина)', 'ba', '387'], ['Botswana', 'bw', '267'], ['Brazil (Brasil)', 'br', '55'], ['British Indian Ocean Territory', 'io', '246'], ['British Virgin Islands', 'vg', '1284'], ['Brunei', 'bn', '673'], ['Bulgaria (България)', 'bg', '359'], ['Burkina Faso', 'bf', '226'], ['Burundi (Uburundi)', 'bi', '257'], ['Cambodia (កម្ពុជា)', 'kh', '855'], ['Cameroon (Cameroun)', 'cm', '237'], ['Canada', 'ca', '1', '+. (...) ...-....', 1, ['204', '236', '249', '250', '289', '306', '343', '365', '387', '403', '416', '418', '431', '437', '438', '450', '506', '514', '519', '548', '579', '581', '587', '604', '613', '639', '647', '672', '705', '709', '742', '778', '780', '782', '807', '819', '825', '867', '873', '902', '905']], ['Cape Verde (Kabu Verdi)', 'cv', '238'], ['Caribbean Netherlands', 'bq', '599', '', 1], ['Cayman Islands', 'ky', '1345'], ['Central African Republic (République centrafricaine)', 'cf', '236'], ['Chad (Tchad)', 'td', '235'], ['Chile', 'cl', '56'], ['China (中国)', 'cn', '86', '+.. ..-........'], ['Colombia', 'co', '57'], ['Comoros (‫جزر القمر‬‎)', 'km', '269'], ['Congo (DRC) (Jamhuri ya Kidemokrasia ya Kongo)', 'cd', '243'], ['Congo (Republic) (Congo-Brazzaville)', 'cg', '242'], ['Cook Islands', 'ck', '682'], ['Costa Rica', 'cr', '506', '+... ....-....'], ['Côte d’Ivoire', 'ci', '225'], ['Croatia (Hrvatska)', 'hr', '385'], ['Cuba', 'cu', '53'], ['Curaçao', 'cw', '599', '', 0], ['Cyprus (Κύπρος)', 'cy', '357'], ['Czech Republic (Česká republika)', 'cz', '420'], ['Denmark (Danmark)', 'dk', '45', '+.. .. .. .. ..'], ['Djibouti', 'dj', '253'], ['Dominica', 'dm', '1767'], ['Dominican Republic (República Dominicana)', 'do', '1', '', 2, ['809', '829', '849']], ['Ecuador', 'ec', '593'], ['Egypt (‫مصر‬‎)', 'eg', '20'], ['El Salvador', 'sv', '503', '+... ....-....'], ['Equatorial Guinea (Guinea Ecuatorial)', 'gq', '240'], ['Eritrea', 'er', '291'], ['Estonia (Eesti)', 'ee', '372'], ['Ethiopia', 'et', '251'], ['Falkland Islands (Islas Malvinas)', 'fk', '500'], ['Faroe Islands (Føroyar)', 'fo', '298'], ['Fiji', 'fj', '679'], ['Finland (Suomi)', 'fi', '358', '+... .. ... .. ..'], ['France', 'fr', '33', '+.. . .. .. .. ..'], ['French Guiana (Guyane française)', 'gf', '594'], ['French Polynesia (Polynésie française)', 'pf', '689'], ['Gabon', 'ga', '241'], ['Gambia', 'gm', '220'], ['Georgia (საქართველო)', 'ge', '995'], ['Germany (Deutschland)', 'de', '49', '+.. ... .......'], ['Ghana (Gaana)', 'gh', '233'], ['Gibraltar', 'gi', '350'], ['Greece (Ελλάδα)', 'gr', '30'], ['Greenland (Kalaallit Nunaat)', 'gl', '299'], ['Grenada', 'gd', '1473'], ['Guadeloupe', 'gp', '590', '', 0], ['Guam', 'gu', '1671'], ['Guatemala', 'gt', '502', '+... ....-....'], ['Guinea (Guinée)', 'gn', '224'], ['Guinea-Bissau (Guiné Bissau)', 'gw', '245'], ['Guyana', 'gy', '592'], ['Haiti', 'ht', '509', '+... ....-....'], ['Honduras', 'hn', '504'], ['Hong Kong (香港)', 'hk', '852', '+... .... ....'], ['Hungary (Magyarország)', 'hu', '36'], ['Iceland (Ísland)', 'is', '354', '+... ... ....'], ['India (भारत)', 'in', '91', '+.. .....-.....'], ['Indonesia', 'id', '62'], ['Iran (‫ایران‬‎)', 'ir', '98'], ['Iraq (‫العراق‬‎)', 'iq', '964'], ['Ireland', 'ie', '353', '+... .. .......'], ['Israel (‫ישראל‬‎)', 'il', '972'], ['Italy (Italia)', 'it', '39', '+.. ... ......', 0], ['Jamaica', 'jm', '1876'], ['Japan (日本)', 'jp', '81', '+.. ... .. ....'], ['Jordan (‫الأردن‬‎)', 'jo', '962'], ['Kazakhstan (Казахстан)', 'kz', '7', '+. ... ...-..-..', 1], ['Kenya', 'ke', '254'], ['Kiribati', 'ki', '686'], ['Kuwait (‫الكويت‬‎)', 'kw', '965'], ['Kyrgyzstan (Кыргызстан)', 'kg', '996'], ['Laos (ລາວ)', 'la', '856'], ['Latvia (Latvija)', 'lv', '371'], ['Lebanon (‫لبنان‬‎)', 'lb', '961'], ['Lesotho', 'ls', '266'], ['Liberia', 'lr', '231'], ['Libya (‫ليبيا‬‎)', 'ly', '218'], ['Liechtenstein', 'li', '423'], ['Lithuania (Lietuva)', 'lt', '370'], ['Luxembourg', 'lu', '352'], ['Macau (澳門)', 'mo', '853'], ['Macedonia (FYROM) (Македонија)', 'mk', '389'], ['Madagascar (Madagasikara)', 'mg', '261'], ['Malawi', 'mw', '265'], ['Malaysia', 'my', '60', '+.. ..-....-....'], ['Maldives', 'mv', '960'], ['Mali', 'ml', '223'], ['Malta', 'mt', '356'], ['Marshall Islands', 'mh', '692'], ['Martinique', 'mq', '596'], ['Mauritania (‫موريتانيا‬‎)', 'mr', '222'], ['Mauritius (Moris)', 'mu', '230'], ['Mexico (México)', 'mx', '52'], ['Micronesia', 'fm', '691'], ['Moldova (Republica Moldova)', 'md', '373'], ['Monaco', 'mc', '377'], ['Mongolia (Монгол)', 'mn', '976'], ['Montenegro (Crna Gora)', 'me', '382'], ['Montserrat', 'ms', '1664'], ['Morocco (‫المغرب‬‎)', 'ma', '212'], ['Mozambique (Moçambique)', 'mz', '258'], ['Myanmar (Burma) (မြန်မာ)', 'mm', '95'], ['Namibia (Namibië)', 'na', '264'], ['Nauru', 'nr', '674'], ['Nepal (नेपाल)', 'np', '977'], ['Netherlands (Nederland)', 'nl', '31', '+.. .. ........'], ['New Caledonia (Nouvelle-Calédonie)', 'nc', '687'], ['New Zealand', 'nz', '64', '+.. ...-...-....'], ['Nicaragua', 'ni', '505'], ['Niger (Nijar)', 'ne', '227'], ['Nigeria', 'ng', '234'], ['Niue', 'nu', '683'], ['Norfolk Island', 'nf', '672'], ['North Korea (조선 민주주의 인민 공화국)', 'kp', '850'], ['Northern Mariana Islands', 'mp', '1670'], ['Norway (Norge)', 'no', '47', '+.. ... .. ...'], ['Oman (‫عُمان‬‎)', 'om', '968'], ['Pakistan (‫پاکستان‬‎)', 'pk', '92', '+.. ...-.......'], ['Palau', 'pw', '680'], ['Palestine (‫فلسطين‬‎)', 'ps', '970'], ['Panama (Panamá)', 'pa', '507'], ['Papua New Guinea', 'pg', '675'], ['Paraguay', 'py', '595'], ['Peru (Perú)', 'pe', '51'], ['Philippines', 'ph', '63', '+.. ... ....'], ['Poland (Polska)', 'pl', '48', '+.. ...-...-...'], ['Portugal', 'pt', '351'], ['Puerto Rico', 'pr', '1', '', 3, ['787', '939']], ['Qatar (‫قطر‬‎)', 'qa', '974'], ['Réunion (La Réunion)', 're', '262'], ['Romania (România)', 'ro', '40'], ['Russia (Россия)', 'ru', '7', '+. ... ...-..-..', 0], ['Rwanda', 'rw', '250'], ['Saint Barthélemy (Saint-Barthélemy)', 'bl', '590', '', 1], ['Saint Helena', 'sh', '290'], ['Saint Kitts and Nevis', 'kn', '1869'], ['Saint Lucia', 'lc', '1758'], ['Saint Martin (Saint-Martin (partie française))', 'mf', '590', '', 2], ['Saint Pierre and Miquelon (Saint-Pierre-et-Miquelon)', 'pm', '508'], ['Saint Vincent and the Grenadines', 'vc', '1784'], ['Samoa', 'ws', '685'], ['San Marino', 'sm', '378'], ['São Tomé and Príncipe (São Tomé e Príncipe)', 'st', '239'], ['Saudi Arabia (‫المملكة العربية السعودية‬‎)', 'sa', '966'], ['Senegal (Sénégal)', 'sn', '221'], ['Serbia (Србија)', 'rs', '381'], ['Seychelles', 'sc', '248'], ['Sierra Leone', 'sl', '232'], ['Singapore', 'sg', '65', '+.. ....-....'], ['Sint Maarten', 'sx', '1721'], ['Slovakia (Slovensko)', 'sk', '421'], ['Slovenia (Slovenija)', 'si', '386'], ['Solomon Islands', 'sb', '677'], ['Somalia (Soomaaliya)', 'so', '252'], ['South Africa', 'za', '27'], ['South Korea (대한민국)', 'kr', '82'], ['South Sudan (‫جنوب السودان‬‎)', 'ss', '211'], ['Spain (España)', 'es', '34', '+.. ... ... ...'], ['Sri Lanka (ශ්‍රී ලංකාව)', 'lk', '94'], ['Sudan (‫السودان‬‎)', 'sd', '249'], ['Suriname', 'sr', '597'], ['Swaziland', 'sz', '268'], ['Sweden (Sverige)', 'se', '46', '+.. .. ... .. ..'], ['Switzerland (Schweiz)', 'ch', '41', '+.. .. ... .. ..'], ['Syria (‫سوريا‬‎)', 'sy', '963'], ['Taiwan (台灣)', 'tw', '886'], ['Tajikistan', 'tj', '992'], ['Tanzania', 'tz', '255'], ['Thailand (ไทย)', 'th', '66'], ['Timor-Leste', 'tl', '670'], ['Togo', 'tg', '228'], ['Tokelau', 'tk', '690'], ['Tonga', 'to', '676'], ['Trinidad and Tobago', 'tt', '1868'], ['Tunisia (‫تونس‬‎)', 'tn', '216'], ['Turkey (Türkiye)', 'tr', '90', '+.. ... ... .. ..'], ['Turkmenistan', 'tm', '993'], ['Turks and Caicos Islands', 'tc', '1649'], ['Tuvalu', 'tv', '688'], ['U.S. Virgin Islands', 'vi', '1340'], ['Uganda', 'ug', '256'], ['Ukraine (Україна)', 'ua', '380'], ['United Arab Emirates (‫الإمارات العربية المتحدة‬‎)', 'ae', '971'], ['United Kingdom', 'gb', '44', '+.. .... ......'], ['United States', 'us', '1', '+. (...) ...-....', 0], ['Uruguay', 'uy', '598'], ['Uzbekistan (Oʻzbekiston)', 'uz', '998'], ['Vanuatu', 'vu', '678'], ['Vatican City (Città del Vaticano)', 'va', '39', '+.. .. .... ....', 1], ['Venezuela', 've', '58'], ['Vietnam (Việt Nam)', 'vn', '84'], ['Wallis and Futuna', 'wf', '681'], ['Yemen (‫اليمن‬‎)', 'ye', '967'], ['Zambia', 'zm', '260'], ['Zimbabwe', 'zw', '263']];
+var allCountries = [['Afghanistan (‫افغانستان‬‎)', 'af', '93', '+..-..-...-....'], ['Albania (Shqipëri)', 'al', '355', '+...(...)...-...'], ['Algeria (‫الجزائر‬‎)', 'dz', '213', '+...-..-...-....'], ['American Samoa', 'as', '1684', '+.(...)...-....'], ['Andorra', 'ad', '376', '+...-...-...'], ['Angola', 'ao', '244', '+...(...)...-...'], ['Anguilla', 'ai', '1264', '+.(...)...-....'], ['Antigua and Barbuda', 'ag', '1268', '+.(...)...-....'], ['Argentina', 'ar', '54', '+..(...)...-....'], ['Armenia (Հայաստան)', 'am', '374', '+...-..-...-...'], ['Aruba', 'aw', '297', '+...-...-....'], ['Australia', 'au', '61', '+.. ... ... ...'], ['Austria (Österreich)', 'at', '43', '+..(...)...-....'], ['Azerbaijan (Azərbaycan)', 'az', '994', '+...-..-...-..-..'], ['Bahamas', 'bs', '1242', '+.(...)...-....'], ['Bahrain (‫البحرين‬‎)', 'bh', '973', '+...-....-....'], ['Bangladesh (বাংলাদেশ)', 'bd', '880', '+...-..-...-...'], ['Barbados', 'bb', '1246', '+.(...)...-....'], ['Belarus (Беларусь)', 'by', '375', '+...(..)...-..-..'], ['Belgium (België)', 'be', '32', '+.. ... .. .. ..'], ['Belize', 'bz', '501', '+...-...-....'], ['Benin (Bénin)', 'bj', '229', '+...-..-..-....'], ['Bermuda', 'bm', '1441', '+.(...)...-....'], ['Bhutan (འབྲུག)', 'bt', '975', '+...-.-...-...'], ['Bolivia', 'bo', '591', '+...-.-...-....'], ['Bosnia and Herzegovina (Босна и Херцеговина)', 'ba', '387', '+...-..-....'], ['Botswana', 'bw', '267', '+...-..-...-...'], ['Brazil (Brasil)', 'br', '55', '+..-..-....-....'], ['British Indian Ocean Territory', 'io', '246', '+...-...-....'], ['British Virgin Islands', 'vg', '1284', '+.(...)...-....'], ['Brunei', 'bn', '673', '+...-...-....'], ['Bulgaria (България)', 'bg', '359', '+...(...)...-...'], ['Burkina Faso', 'bf', '226', '+...-..-..-....'], ['Burundi (Uburundi)', 'bi', '257', '+...-..-..-....'], ['Cambodia (កម្ពុជា)', 'kh', '855', '+...-..-...-...'], ['Cameroon (Cameroun)', 'cm', '237', '+...-....-....'], ['Canada', 'ca', '1', '+. (...) ...-....', 1, ['204', '236', '249', '250', '289', '306', '343', '365', '387', '403', '416', '418', '431', '437', '438', '450', '506', '514', '519', '548', '579', '581', '587', '604', '613', '639', '647', '672', '705', '709', '742', '778', '780', '782', '807', '819', '825', '867', '873', '902', '905']], ['Cape Verde (Kabu Verdi)', 'cv', '238', '+...(...)..-..'], ['Caribbean Netherlands', 'bq', '599', '+...-...-....', 1], ['Cayman Islands', 'ky', '1345', '+.(...)...-....'], ['Central African Republic (République centrafricaine)', 'cf', '236', '+...-..-..-....'], ['Chad (Tchad)', 'td', '235', '+...-..-..-..-..'], ['Chile', 'cl', '56', '+..-.-....-....'], ['China (中国)', 'cn', '86', '+.. ..-........'], ['Colombia', 'co', '57', '+..(...)...-....'], ['Comoros (‫جزر القمر‬‎)', 'km', '269', '+...-..-.....'], ['Congo (DRC) (Jamhuri ya Kidemokrasia ya Kongo)', 'cd', '243', '+...(...)...-...'], ['Congo (Republic) (Congo-Brazzaville)', 'cg', '242', '+...-..-...-....'], ['Cook Islands', 'ck', '682', '+...-..-...'], ['Costa Rica', 'cr', '506', '+... ....-....'], ['Côte d’Ivoire', 'ci', '225', '+...-..-...-...'], ['Croatia (Hrvatska)', 'hr', '385', '+...-..-...-...'], ['Cuba', 'cu', '53', '+..-.-...-....'], ['Curaçao', 'cw', '599', '+...-...-....', 0], ['Cyprus (Κύπρος)', 'cy', '357', '+...-..-...-...'], ['Czech Republic (Česká republika)', 'cz', '420', '+...(...)...-...'], ['Denmark (Danmark)', 'dk', '45', '+.. .. .. .. ..'], ['Djibouti', 'dj', '253', '+...-..-..-..-..'], ['Dominica', 'dm', '1767', '+.(...)...-....'], ['Dominican Republic (República Dominicana)', 'do', '1', '+.(...)...-....', 2, ['809', '829', '849']], ['Ecuador', 'ec', '593', '+...-.-...-....'], ['Egypt (‫مصر‬‎)', 'eg', '20', '+..(...)...-....'], ['El Salvador', 'sv', '503', '+... ....-....'], ['Equatorial Guinea (Guinea Ecuatorial)', 'gq', '240', '+...-..-...-....'], ['Eritrea', 'er', '291', '+...-.-...-...'], ['Estonia (Eesti)', 'ee', '372', '+...-...-....'], ['Ethiopia', 'et', '251', '+...-..-...-....'], ['Falkland Islands (Islas Malvinas)', 'fk', '500', '+...-.....'], ['Faroe Islands (Føroyar)', 'fo', '298', '+...-...-...'], ['Fiji', 'fj', '679', '+...-..-.....'], ['Finland (Suomi)', 'fi', '358', '+... .. ... .. ..'], ['France', 'fr', '33', '+.. . .. .. .. ..'], ['French Guiana (Guyane française)', 'gf', '594', '+...-.....-....'], ['French Polynesia (Polynésie française)', 'pf', '689', '+...-..-..-..'], ['Gabon', 'ga', '241', '+...-.-..-..-..'], ['Gambia', 'gm', '220', '+...(...)..-..'], ['Georgia (საქართველო)', 'ge', '995', '+...(...)...-...'], ['Germany (Deutschland)', 'de', '49', '+.. ... .......'], ['Ghana (Gaana)', 'gh', '233', '+...(...)...-...'], ['Gibraltar', 'gi', '350', '+...-...-.....'], ['Greece (Ελλάδα)', 'gr', '30', '+..(...)...-....'], ['Greenland (Kalaallit Nunaat)', 'gl', '299', '+...-..-..-..'], ['Grenada', 'gd', '1473', '+.(...)...-....'], ['Guadeloupe', 'gp', '590', '', 0], ['Guam', 'gu', '1671', '+.(...)...-....'], ['Guatemala', 'gt', '502', '+... ....-....'], ['Guinea (Guinée)', 'gn', '224', '+...-..-...-...'], ['Guinea-Bissau (Guiné Bissau)', 'gw', '245', '+...-.-......'], ['Guyana', 'gy', '592', '+...-...-....'], ['Haiti', 'ht', '509', '+... ....-....'], ['Honduras', 'hn', '504', '+...-....-....'], ['Hong Kong (香港)', 'hk', '852', '+... .... ....'], ['Hungary (Magyarország)', 'hu', '36', '+..(...)...-...'], ['Iceland (Ísland)', 'is', '354', '+... ... ....'], ['India (भारत)', 'in', '91', '+.. .....-.....'], ['Indonesia', 'id', '62', '+..-..-...-..'], ['Iran (‫ایران‬‎)', 'ir', '98', '+..(...)...-....'], ['Iraq (‫العراق‬‎)', 'iq', '964', '+...(...)...-....'], ['Ireland', 'ie', '353', '+... .. .......'], ['Israel (‫ישראל‬‎)', 'il', '972', '+...-.-...-....'], ['Italy (Italia)', 'it', '39', '+.. ... ......', 0], ['Jamaica', 'jm', '1876', '+.(...)...-....'], ['Japan (日本)', 'jp', '81', '+.. ... .. ....'], ['Jordan (‫الأردن‬‎)', 'jo', '962', '+...-.-....-....'], ['Kazakhstan (Казахстан)', 'kz', '7', '+. ... ...-..-..', 1], ['Kenya', 'ke', '254', '+...-...-......'], ['Kiribati', 'ki', '686', '+...-..-...'], ['Kuwait (‫الكويت‬‎)', 'kw', '965', '+...-....-....'], ['Kyrgyzstan (Кыргызстан)', 'kg', '996', '+...(...)...-...'], ['Laos (ລາວ)', 'la', '856', '+...-..-...-...'], ['Latvia (Latvija)', 'lv', '371', '+...-..-...-...'], ['Lebanon (‫لبنان‬‎)', 'lb', '961', '+...-.-...-...'], ['Lesotho', 'ls', '266', '+...-.-...-....'], ['Liberia', 'lr', '231', '+...-..-...-...'], ['Libya (‫ليبيا‬‎)', 'ly', '218', '+...-..-...-...'], ['Liechtenstein', 'li', '423', '+...(...)...-....'], ['Lithuania (Lietuva)', 'lt', '370', '+...(...)..-...'], ['Luxembourg', 'lu', '352', '+...(...)...-...'], ['Macau (澳門)', 'mo', '853', '+...-....-....'], ['Macedonia (FYROM) (Македонија)', 'mk', '389', '+...-..-...-...'], ['Madagascar (Madagasikara)', 'mg', '261', '+...-..-..-.....'], ['Malawi', 'mw', '265', '+...-.-....-....'], ['Malaysia', 'my', '60', '+.. ..-....-....'], ['Maldives', 'mv', '960', '+...-...-....'], ['Mali', 'ml', '223', '+...-..-..-....'], ['Malta', 'mt', '356', '+...-....-....'], ['Marshall Islands', 'mh', '692', '+...-...-....'], ['Martinique', 'mq', '596', '+...(...)..-..-..'], ['Mauritania (‫موريتانيا‬‎)', 'mr', '222', '+...-..-..-....'], ['Mauritius (Moris)', 'mu', '230', '+...-...-....'], ['Mexico (México)', 'mx', '52', '+..-..-..-....'], ['Micronesia', 'fm', '691', '+...-...-....'], ['Moldova (Republica Moldova)', 'md', '373', '+...-....-....'], ['Monaco', 'mc', '377', '+...-..-...-...'], ['Mongolia (Монгол)', 'mn', '976', '+...-..-..-....'], ['Montenegro (Crna Gora)', 'me', '382', '+...-..-...-...'], ['Montserrat', 'ms', '1664', '+.(...)...-....'], ['Morocco (‫المغرب‬‎)', 'ma', '212', '+...-..-....-...'], ['Mozambique (Moçambique)', 'mz', '258', '+...-..-...-...'], ['Myanmar (Burma) (မြန်မာ)', 'mm', '95', '+..-...-...'], ['Namibia (Namibië)', 'na', '264', '+...-..-...-....'], ['Nauru', 'nr', '674', '+...-...-....'], ['Nepal (नेपाल)', 'np', '977', '+...-..-...-...'], ['Netherlands (Nederland)', 'nl', '31', '+.. .. ........'], ['New Caledonia (Nouvelle-Calédonie)', 'nc', '687', '+...-..-....'], ['New Zealand', 'nz', '64', '+.. ...-...-....'], ['Nicaragua', 'ni', '505', '+...-....-....'], ['Niger (Nijar)', 'ne', '227', '+...-..-..-....'], ['Nigeria', 'ng', '234', '+...-..-...-..'], ['Niue', 'nu', '683', '+...-....'], ['Norfolk Island', 'nf', '672', '+...-...-...'], ['North Korea (조선 민주주의 인민 공화국)', 'kp', '850', '+...-...-...'], ['Northern Mariana Islands', 'mp', '1670', '+.(...)...-....'], ['Norway (Norge)', 'no', '47', '+.. ... .. ...'], ['Oman (‫عُمان‬‎)', 'om', '968', '+...-..-...-...'], ['Pakistan (‫پاکستان‬‎)', 'pk', '92', '+.. ...-.......'], ['Palau', 'pw', '680', '+...-...-....'], ['Palestine (‫فلسطين‬‎)', 'ps', '970', '+...-..-...-....'], ['Panama (Panamá)', 'pa', '507', '+...-...-....'], ['Papua New Guinea', 'pg', '675', '+...(...)..-...'], ['Paraguay', 'py', '595', '+...(...)...-...'], ['Peru (Perú)', 'pe', '51', '+..(...)...-...'], ['Philippines', 'ph', '63', '+.. ... ....'], ['Poland (Polska)', 'pl', '48', '+.. ...-...-...'], ['Portugal', 'pt', '351', '+...-..-...-....'], ['Puerto Rico', 'pr', '1', '', 3, ['787', '939']], ['Qatar (‫قطر‬‎)', 'qa', '974', '+...-....-....'], ['Réunion (La Réunion)', 're', '262', '+...-.....-....'], ['Romania (România)', 'ro', '40', '+..-..-...-....'], ['Russia (Россия)', 'ru', '7', '+. ... ...-..-..', 0], ['Rwanda', 'rw', '250', '+...(...)...-...'], ['Saint Barthélemy (Saint-Barthélemy)', 'bl', '590', '', 1], ['Saint Helena', 'sh', '290'], ['Saint Kitts and Nevis', 'kn', '1869', '+.(...)...-....'], ['Saint Lucia', 'lc', '1758', '+.(...)...-....'], ['Saint Martin (Saint-Martin (partie française))', 'mf', '590', '', 2], ['Saint Pierre and Miquelon (Saint-Pierre-et-Miquelon)', 'pm', '508'], ['Saint Vincent and the Grenadines', 'vc', '1784', '+.(...)...-....'], ['Samoa', 'ws', '685', '+...-..-....'], ['San Marino', 'sm', '378', '+...-....-......'], ['São Tomé and Príncipe (São Tomé e Príncipe)', 'st', '239', '+...-..-.....'], ['Saudi Arabia (‫المملكة العربية السعودية‬‎)', 'sa', '966', '+...-.-...-....'], ['Senegal (Sénégal)', 'sn', '221', '+...-..-...-....'], ['Serbia (Србија)', 'rs', '381', '+...-..-...-....'], ['Seychelles', 'sc', '248', '+...-.-...-...'], ['Sierra Leone', 'sl', '232', '+...-..-......'], ['Singapore', 'sg', '65', '+.. ....-....'], ['Sint Maarten', 'sx', '1721', '+.(...)...-....'], ['Slovakia (Slovensko)', 'sk', '421', '+...(...)...-...'], ['Slovenia (Slovenija)', 'si', '386', '+...-..-...-...'], ['Solomon Islands', 'sb', '677', '+...-.....'], ['Somalia (Soomaaliya)', 'so', '252', '+...-.-...-...'], ['South Africa', 'za', '27', '+..-..-...-....'], ['South Korea (대한민국)', 'kr', '82', '+..-..-...-....'], ['South Sudan (‫جنوب السودان‬‎)', 'ss', '211', '+...-..-...-....'], ['Spain (España)', 'es', '34', '+.. ... ... ...'], ['Sri Lanka (ශ්‍රී ලංකාව)', 'lk', '94', '+..-..-...-....'], ['Sudan (‫السودان‬‎)', 'sd', '249', '+...-..-...-....'], ['Suriname', 'sr', '597', '+...-...-...'], ['Swaziland', 'sz', '268', '+...-..-..-....'], ['Sweden (Sverige)', 'se', '46', '+.. .. ... .. ..'], ['Switzerland (Schweiz)', 'ch', '41', '+.. .. ... .. ..'], ['Syria (‫سوريا‬‎)', 'sy', '963', '+...-..-....-...'], ['Taiwan (台灣)', 'tw', '886', '+...-....-....'], ['Tajikistan', 'tj', '992', '+...-..-...-....'], ['Tanzania', 'tz', '255', '+...-..-...-....'], ['Thailand (ไทย)', 'th', '66', '+..-..-...-...'], ['Timor-Leste', 'tl', '670', '+...-...-....'], ['Togo', 'tg', '228', '+...-..-...-...'], ['Tokelau', 'tk', '690', '+...-....'], ['Tonga', 'to', '676', '+...-.....'], ['Trinidad and Tobago', 'tt', '1868', '+.(...)...-....'], ['Tunisia (‫تونس‬‎)', 'tn', '216', '+...-..-...-...'], ['Turkey (Türkiye)', 'tr', '90', '+.. ... ... .. ..'], ['Turkmenistan', 'tm', '993', '+...-.-...-....'], ['Turks and Caicos Islands', 'tc', '1649', '+.(...)...-....'], ['Tuvalu', 'tv', '688', '+...-.....'], ['U.S. Virgin Islands', 'vi', '1340', '+.(...)...-....'], ['Uganda', 'ug', '256', '+...(...)...-...'], ['Ukraine (Україна)', 'ua', '380', '+...(..)...-..-..'], ['United Arab Emirates (‫الإمارات العربية المتحدة‬‎)', 'ae', '971', '+...-.-...-....'], ['United Kingdom', 'gb', '44', '+.. .... ......'], ['United States', 'us', '1', '+. (...) ...-....', 0], ['Uruguay', 'uy', '598', '+...-.-...-..-..'], ['Uzbekistan (Oʻzbekiston)', 'uz', '998', '+...-..-...-....'], ['Vanuatu', 'vu', '678', '+...-.....'], ['Vatican City (Città del Vaticano)', 'va', '39', '+.. .. .... ....', 1], ['Venezuela', 've', '58', '+..(...)...-....'], ['Vietnam (Việt Nam)', 'vn', '84', '+..-..-....-...'], ['Wallis and Futuna', 'wf', '681', '+...-..-....'], ['Yemen (‫اليمن‬‎)', 'ye', '967', '+...-.-...-...'], ['Zambia', 'zm', '260', '+...-..-...-....'], ['Zimbabwe', 'zw', '263', '+...-.-......']];
 
 // we will build this in the loop below
 var allCountryCodes = {};
+var iso2Lookup = {};
 var addCountryCode = function addCountryCode(iso2, dialCode, priority) {
-  if (!(dialCode in allCountryCodes)) {
-    allCountryCodes[dialCode] = [];
-  }
-  var index = priority || 0;
-  allCountryCodes[dialCode][index] = iso2;
+   if (!(dialCode in allCountryCodes)) {
+      allCountryCodes[dialCode] = [];
+   }
+   var index = priority || 0;
+   allCountryCodes[dialCode][index] = iso2;
 };
 
-// loop over all of the countries above
-// allCountries2 = _.map(allCountries, function(country) {
-//   return {
-//     name: country[0],
-//     iso2: country[1],
-//     dialCode: country[2],
-//     format: country[3],
-//     hasAreaCodes: country.length > 4
-//   }
-// });
-
 for (var i = 0; i < allCountries.length; i++) {
-  // countries
-  var c = allCountries[i];
-  allCountries[i] = {
-    name: c[0],
-    iso2: c[1],
-    dialCode: c[2],
-    priority: c[4] || 0
-  };
-  // format
-  if (c[3]) {
-    allCountries[i].format = c[3];
-  }
+   // countries
+   var c = allCountries[i];
+   allCountries[i] = {
+      name: c[0],
+      iso2: c[1],
+      dialCode: c[2],
+      priority: c[4] || 0
+   };
 
-  // area codes
-  if (c[5]) {
-    allCountries[i].hasAreaCodes = true;
-    for (var j = 0; j < c[5].length; j++) {
-      // full dial code is country code + dial code
-      var dialCode = c[2] + c[5][j];
-      addCountryCode(c[1], dialCode);
-    }
-  }
+   // format
+   if (c[3]) {
+      allCountries[i].format = c[3];
+   }
 
-  // dial codes
-  addCountryCode(c[1], c[2], c[4]);
+   // area codes
+   if (c[5]) {
+      allCountries[i].hasAreaCodes = true;
+      for (var j = 0; j < c[5].length; j++) {
+         // full dial code is country code + dial code
+         var dialCode = c[2] + c[5][j];
+         addCountryCode(c[1], dialCode);
+      }
+   }
+   iso2Lookup[allCountries[i].iso2] = i;
+
+   // dial codes
+   addCountryCode(c[1], c[2], c[4]);
 }
 
 module.exports = {
-  allCountries: allCountries,
-  allCountryCodes: allCountryCodes
+   allCountries: allCountries,
+   iso2Lookup: iso2Lookup,
+   allCountryCodes: allCountryCodes
 };
 
 },{}],"react-telephone-input":[function(require,module,exports){
@@ -3012,35 +3277,45 @@ module.exports = {
 
 // TODO - fix the onlyContries props. Currently expects that as an array of country object, but users should be able to send in array of country isos
 
-function _defineProperty(obj, key, value) {
-    if (key in obj) {
-        Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true });
-    } else {
-        obj[key] = value;
-    }return obj;
-}
+Object.defineProperty(exports, '__esModule', {
+    value: true
+});
+
+var _extends = Object.assign || function (target) {
+    for (var i = 1; i < arguments.length; i++) {
+        var source = arguments[i];for (var key in source) {
+            if (Object.prototype.hasOwnProperty.call(source, key)) {
+                target[key] = source[key];
+            }
+        }
+    }return target;
+};
 
 var some = require('lodash/collection/some');
 var findWhere = require('lodash/collection/findWhere');
 var reduce = require('lodash/collection/reduce');
 var map = require('lodash/collection/map');
 var filter = require('lodash/collection/filter');
-var any = require('lodash/collection/any');
 var findIndex = require('lodash/array/findIndex');
 var first = require('lodash/array/first');
 var rest = require('lodash/array/rest');
 var debounce = require('lodash/function/debounce');
 var memoize = require('lodash/function/memoize');
-var isFunction = require('lodash/lang/isFunction');
+var assign = require('lodash/object/assign');
+var isEqual = require('lodash/lang/isEqual');
 // import lodash string methods
 var trim = require('lodash/string/trim');
 var startsWith = require('lodash/string/startsWith');
 
 var React = require('react');
+var ReactDOM = require('react-dom');
 var onClickOutside = require('react-onclickoutside');
 var classNames = require('classnames');
-var countryData = require('./country_data');
+var countryData = require('./country_data.js');
+// var countryData = require('country-telephone-data')
 var allCountries = countryData.allCountries;
+var iso2Lookup = countryData.iso2Lookup;
+var allCountryCodes = countryData.allCountryCodes;
 
 if (typeof document !== 'undefined') {
     var isModernBrowser = Boolean(document.createElement('input').setSelectionRange);
@@ -3071,30 +3346,20 @@ function isNumberValid(inputNumber) {
 var ReactTelephoneInput = React.createClass({
     displayName: 'ReactTelephoneInput',
 
-    mixins: [onClickOutside],
     getInitialState: function getInitialState() {
-        var inputNumber = this.props.value || '';
-        var selectedCountryGuess = this.guessSelectedCountry(inputNumber.replace(/\D/g, ''));
-        var selectedCountryGuessIndex = findIndex(allCountries, selectedCountryGuess);
-        var formattedNumber = this.formatNumber(inputNumber.replace(/\D/g, ''), selectedCountryGuess ? selectedCountryGuess.format : null);
-        var preferredCountries = [];
+        var preferredCountries = this.props.preferredCountries.map(function (iso2) {
+            return iso2Lookup.hasOwnProperty(iso2) ? allCountries[iso2Lookup[iso2]] : null;
+        }).filter(function (val) {
+            return val !== null;
+        });
 
-        preferredCountries = filter(allCountries, function (country) {
-            return any(this.props.preferredCountries, function (preferredCountry) {
-                return preferredCountry === country.iso2;
-            });
-        }, this);
-
-        return {
+        return assign({}, {
             preferredCountries: preferredCountries,
-            selectedCountry: selectedCountryGuess,
-            highlightCountryIndex: selectedCountryGuessIndex,
-            formattedNumber: formattedNumber,
             showDropDown: false,
             queryString: '',
             freezeSelection: false,
-            debouncedQueryStingSearcher: debounce(this.searchCountry, 100)
-        };
+            debouncedQueryStingSearcher: debounce(this.searchCountry, 300)
+        }, this._mapPropsToState(this.props, true));
     },
     propTypes: {
         className: React.PropTypes.string,
@@ -3113,21 +3378,31 @@ var ReactTelephoneInput = React.createClass({
         flagViewSelectedClassName: React.PropTypes.string,
         flagViewShownClassName: React.PropTypes.string,
         value: React.PropTypes.string,
+        initialValue: React.PropTypes.string,
         autoFormat: React.PropTypes.bool,
         defaultCountry: React.PropTypes.string,
         onlyCountries: React.PropTypes.arrayOf(React.PropTypes.object),
-        preferredCountries: React.PropTypes.arrayOf(React.PropTypes.object),
+        preferredCountries: React.PropTypes.arrayOf(React.PropTypes.string),
+        classNames: React.PropTypes.string,
+        inputId: React.PropTypes.string,
         onChange: React.PropTypes.func,
-        onEnterKeyPress: React.PropTypes.func
+        onEnterKeyPress: React.PropTypes.func,
+        onBlur: React.PropTypes.func,
+        onFocus: React.PropTypes.func,
+        disabled: React.PropTypes.bool,
+        pattern: React.PropTypes.string
     },
     getDefaultProps: function getDefaultProps() {
         return {
-            value: '',
             autoFormat: true,
             onlyCountries: allCountries,
             defaultCountry: allCountries[0].iso2,
             isValid: isNumberValid,
-            onEnterKeyPress: function onEnterKeyPress() {}
+            flagsImagePath: 'flags.png',
+            onEnterKeyPress: function onEnterKeyPress() {},
+            preferredCountries: [],
+            disabled: false,
+            placeholder: '+1 (702) 123-4567'
         };
     },
     getNumber: function getNumber() {
@@ -3141,8 +3416,14 @@ var ReactTelephoneInput = React.createClass({
 
         this._cursorToEnd(true);
         if (typeof this.props.onChange === 'function') {
-            this.props.onChange(this.state.formattedNumber);
+            this.props.onChange(this.state.formattedNumber, this.state.selectedCountry);
         }
+    },
+    shouldComponentUpdate: function shouldComponentUpdate(nextProps, nextState) {
+        return !isEqual(nextProps, this.props) || !isEqual(nextState, this.state);
+    },
+    componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
+        this.setState(this._mapPropsToState(nextProps));
     },
     componentWillUnmount: function componentWillUnmount() {
         document.removeEventListener('keydown', this.handleKeydown);
@@ -3152,7 +3433,7 @@ var ReactTelephoneInput = React.createClass({
             return;
         }
 
-        var container = this.refs.flagDropdownList.getDOMNode();
+        var container = ReactDOM.findDOMNode(this.refs.flagDropdownList);
 
         if (!container) {
             return;
@@ -3220,9 +3501,9 @@ var ReactTelephoneInput = React.createClass({
 
     // put the cursor to the end of the input (usually after a focus event)
     _cursorToEnd: function _cursorToEnd(skipFocus) {
-        var input = this.refs.numberInput.getDOMNode();
+        var input = this.refs.numberInput;
         if (skipFocus) {
-            this.handleInputFocus();
+            this._fillDialCode();
         } else {
             input.focus();
 
@@ -3235,17 +3516,30 @@ var ReactTelephoneInput = React.createClass({
     // memoize results based on the first 5/6 characters. That is all that matters
     guessSelectedCountry: memoize(function (inputNumber) {
         var secondBestGuess = findWhere(allCountries, { iso2: this.props.defaultCountry }) || this.props.onlyCountries[0];
+        var inputNumberForCountries = inputNumber.substr(0, 4);
         if (trim(inputNumber) !== '') {
             var bestGuess = reduce(this.props.onlyCountries, function (selectedCountry, country) {
-                if (startsWith(inputNumber, country.dialCode)) {
-                    if (country.dialCode.length > selectedCountry.dialCode.length) {
-                        return country;
-                    }
-                    if (country.dialCode.length === selectedCountry.dialCode.length && country.priority < selectedCountry.priority) {
-                        return country;
-                    }
-                }
 
+                // if the country dialCode exists WITH area code
+
+                if (allCountryCodes[inputNumberForCountries] && allCountryCodes[inputNumberForCountries][0] === country.iso2) {
+                    return country;
+
+                    // if the selected country dialCode is there with the area code
+                } else if (allCountryCodes[inputNumberForCountries] && allCountryCodes[inputNumberForCountries][0] === selectedCountry.iso2) {
+                        return selectedCountry;
+
+                        // else do the original if statement
+                    } else {
+                            if (startsWith(inputNumber, country.dialCode)) {
+                                if (country.dialCode.length > selectedCountry.dialCode.length) {
+                                    return country;
+                                }
+                                if (country.dialCode.length === selectedCountry.dialCode.length && country.priority < selectedCountry.priority) {
+                                    return country;
+                                }
+                            }
+                        }
                 return selectedCountry;
             }, { dialCode: '', priority: 10001 }, this);
         } else {
@@ -3259,16 +3553,19 @@ var ReactTelephoneInput = React.createClass({
         return bestGuess;
     }),
     getElement: function getElement(index) {
-        return this.refs['flag_no_' + index].getDOMNode();
+        return ReactDOM.findDOMNode(this.refs['flag_no_' + index]);
     },
     handleFlagDropdownClick: function handleFlagDropdownClick() {
         var _this = this;
 
+        if (this.props.disabled) {
+            return;
+        }
         // need to put the highlight on the current selected country if the dropdown is going to open up
         this.setState({
             showDropDown: !this.state.showDropDown,
             highlightCountry: findWhere(this.props.onlyCountries, this.state.selectedCountry),
-            highlightCountryIndex: findIndex(this.props.onlyCountries, this.state.selectedCountry)
+            highlightCountryIndex: findIndex(this.state.preferredCountries.concat(this.props.onlyCountries), this.state.selectedCountry)
         }, function () {
             // only need to scrool if the dropdown list is alive
             if (_this.state.showDropDown) {
@@ -3317,17 +3614,21 @@ var ReactTelephoneInput = React.createClass({
             selectedCountry: newSelectedCountry.dialCode.length > 0 ? newSelectedCountry : this.state.selectedCountry
         }, function () {
             if (isModernBrowser) {
+                if (caretPosition === 1 && formattedNumber.length === 2) {
+                    caretPosition++;
+                }
+
                 if (diff > 0) {
                     caretPosition = caretPosition - diff;
                 }
 
                 if (caretPosition > 0 && oldFormattedText.length >= formattedNumber.length) {
-                    this.refs.numberInput.getDOMNode().setSelectionRange(caretPosition, caretPosition);
+                    this.refs.numberInput.setSelectionRange(caretPosition, caretPosition);
                 }
             }
 
             if (this.props.onChange) {
-                this.props.onChange(this.state.formattedNumber);
+                this.props.onChange(this.state.formattedNumber, this.state.selectedCountry);
             }
         });
     },
@@ -3340,8 +3641,8 @@ var ReactTelephoneInput = React.createClass({
 
         // tiny optimization
         if (currentSelectedCountry.iso2 !== nextSelectedCountry.iso2) {
-            // TODO - the below replacement is a bug. It will replace stuff from middle too
-            var newNumber = this.state.formattedNumber.replace(currentSelectedCountry.dialCode, nextSelectedCountry.dialCode);
+            var dialCodeRegex = RegExp('^(\\+' + currentSelectedCountry.dialCode + ')|\\+');
+            var newNumber = this.state.formattedNumber.replace(dialCodeRegex, '+' + nextSelectedCountry.dialCode);
             var formattedNumber = this.formatNumber(newNumber.replace(/\D/g, ''), nextSelectedCountry.format);
 
             this.setState({
@@ -3352,14 +3653,48 @@ var ReactTelephoneInput = React.createClass({
             }, function () {
                 this._cursorToEnd();
                 if (this.props.onChange) {
-                    this.props.onChange(formattedNumber);
+                    this.props.onChange(formattedNumber, nextSelectedCountry);
                 }
             });
+        } else {
+            this.setState({ showDropDown: false });
         }
     },
     handleInputFocus: function handleInputFocus() {
+        // trigger parent component's onFocus handler
+        if (typeof this.props.onFocus === 'function') {
+            this.props.onFocus(this.state.formattedNumer, this.state.selectedCountry);
+        }
+
+        this._fillDialCode();
+    },
+    _mapPropsToState: function _mapPropsToState(props) {
+        var firstCall = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+
+        var inputNumber = undefined;
+
+        if (props.value) {
+            inputNumber = props.value;
+        } else if (props.initialValue && firstCall) {
+            inputNumber = props.initialValue;
+        } else if (this.state && this.state.formattedNumber && this.state.formattedNumber.length > 0) {
+            inputNumber = this.state.formattedNumber;
+        } else {
+            inputNumber = '';
+        }
+
+        var selectedCountryGuess = this.guessSelectedCountry(inputNumber.replace(/\D/g, ''));
+        var selectedCountryGuessIndex = findIndex(allCountries, selectedCountryGuess);
+        var formattedNumber = this.formatNumber(inputNumber.replace(/\D/g, ''), selectedCountryGuess ? selectedCountryGuess.format : null);
+        return {
+            selectedCountry: selectedCountryGuess,
+            highlightCountryIndex: selectedCountryGuessIndex,
+            formattedNumber: formattedNumber
+        };
+    },
+    _fillDialCode: function _fillDialCode() {
         // if the input is blank, insert dial code of the selected country
-        if (this.refs.numberInput.getDOMNode().value === '+') {
+        if (this.refs.numberInput.value === '+') {
             this.setState({ formattedNumber: '+' + this.state.selectedCountry.dialCode });
         }
         if (isFunction(this.props.onFocus)) {
@@ -3390,7 +3725,7 @@ var ReactTelephoneInput = React.createClass({
     searchCountry: function searchCountry() {
         var probableCandidate = this._searchCountry(this.state.queryString) || this.props.onlyCountries[0];
         var probableCandidateIndex = findIndex(this.props.onlyCountries, probableCandidate) + this.state.preferredCountries.length;
-
+        console.log('probableCandidateIndex', probableCandidateIndex);
         this.scrollTo(this.getElement(probableCandidateIndex), true);
 
         this.setState({
@@ -3410,13 +3745,12 @@ var ReactTelephoneInput = React.createClass({
             event.returnValue = false;
         }
 
+        var self = this;
         function _moveHighlight(direction) {
-            var _this2 = this;
-
-            this.setState({
-                highlightCountryIndex: this._getHighlightCountryIndex(direction)
+            self.setState({
+                highlightCountryIndex: self._getHighlightCountryIndex(direction)
             }, function () {
-                _this2.scrollTo(_this2.getElement(_this2.state.highlightCountryIndex), true);
+                self.scrollTo(self.getElement(self.state.highlightCountryIndex), true);
             });
         }
 
@@ -3428,7 +3762,8 @@ var ReactTelephoneInput = React.createClass({
                 _moveHighlight(-1);
                 break;
             case keys.ENTER:
-                this.handleFlagItemClick(this.props.onlyCountries[this.state.highlightCountryIndex], event);
+                console.log('enter key', this.state.highlightCountryIndex, this.props.onlyCountries[this.state.highlightCountryIndex]);
+                this.handleFlagItemClick(this.state.preferredCountries.concat(this.props.onlyCountries)[this.state.highlightCountryIndex], event);
                 break;
             case keys.ESC:
                 this.setState({ showDropDown: false }, this._cursorToEnd);
@@ -3452,12 +3787,12 @@ var ReactTelephoneInput = React.createClass({
         }
     },
     getCountryDropDownList: function getCountryDropDownList() {
-        var _classNames2;
-
         var countryDropDownList = map(this.state.preferredCountries.concat(this.props.onlyCountries), function (country, index) {
-            var _classNames;
-
-            var itemClasses = classNames((_classNames = {}, _defineProperty(_classNames, this.props.countryClassName, true), _defineProperty(_classNames, this.props.countryPreferredClassName, country.iso2 === 'us' || country.iso2 === 'gb'), _defineProperty(_classNames, this.props.countryActiveClassName, country.iso2 === 'us'), _defineProperty(_classNames, this.props.countryHighlightClassName, this.state.highlightCountryIndex === index), _classNames));
+            var itemClasses = classNames({
+                country: true,
+                preferred: findIndex(this.state.preferredCountries, { iso2: country.iso2 }) >= 0,
+                highlight: this.state.highlightCountryIndex === index
+            });
 
             var inputFlagClasses = 'flag ' + country.iso2;
 
@@ -3478,6 +3813,18 @@ var ReactTelephoneInput = React.createClass({
         var dropDownClasses = classNames((_classNames2 = {}, _defineProperty(_classNames2, this.props.dropDownClassName, true), _defineProperty(_classNames2, this.props.dropDownShownClassName, !this.state.showDropDown), _classNames2));
         return React.createElement('ul', { ref: 'flagDropdownList', className: dropDownClasses }, countryDropDownList);
     },
+    getFlagStyle: function getFlagStyle() {
+        return {
+            width: 16,
+            height: 11,
+            backgroundImage: 'url(' + this.props.flagsImagePath + ')'
+        };
+    },
+    handleInputBlur: function handleInputBlur() {
+        if (typeof this.props.onBlur === 'function') {
+            this.props.onBlur(this.state.formattedNumber, this.state.selectedCountry);
+        }
+    },
     render: function render() {
         var _classNames3, _classNames4, _classNames5;
 
@@ -3486,28 +3833,29 @@ var ReactTelephoneInput = React.createClass({
 
         var flagViewClasses = classNames((_classNames5 = {}, _defineProperty(_classNames5, this.props.flagViewClassName, true), _defineProperty(_classNames5, this.props.flagViewShownClassName, this.state.showDropDown), _classNames5));
 
-        var inputFlagClasses = this.props.flagClassName + ' ' + this.props.flagClassName + '_' + this.state.selectedCountry.iso2;
-
-        return React.createElement('div', { className: this.props.className }, React.createElement('input', {
+        var inputFlagClasses = 'flag ' + this.state.selectedCountry.iso2;
+        var otherProps = {};
+        if (this.props.inputId) {
+            otherProps.id = this.props.inputId;
+        }
+        return React.createElement('div', { className: classNames('react-tel-input', this.props.classNames) }, React.createElement('input', _extends({
             onChange: this.handleInput,
             onClick: this.handleInputClick,
             onFocus: this.handleInputFocus,
-            onBlur: this.props.onBlur,
+            onBlur: this.handleInputBlur,
             onKeyDown: this.handleInputKeyDown,
             value: this.state.formattedNumber,
             ref: 'numberInput',
             type: 'tel',
             className: inputClasses,
             autoComplete: 'tel',
-            placeholder: '+1 (702) 123-4567' }), React.createElement('div', { ref: 'flagDropDownButton', className: flagViewClasses, onKeyDown: this.handleKeydown }, React.createElement('div', {
-            className: this.props.flagViewSelectedClassName,
-            ref: 'selectedFlag',
-            onClick: this.props.showDropDownOnClick ? this.handleFlagDropdownClick : null,
-            title: this.state.selectedCountry.name + ': + ' + this.state.selectedCountry.dialCode
-        }, React.createElement('div', { className: inputFlagClasses }, this.props.showDropDownOnClick ? React.createElement('div', { className: arrowClasses }) : null)), this.state.showDropDown ? this.getCountryDropDownList() : ''));
+            pattern: this.props.pattern,
+            placeholder: this.state.placeholder,
+            disabled: this.props.disabled }, otherProps)), React.createElement('div', { ref: 'flagDropDownButton', className: flagViewClasses, onKeyDown: this.handleKeydown }, React.createElement('div', { ref: 'selectedFlag', onClick: this.handleFlagDropdownClick, className: 'selected-flag', title: this.state.selectedCountry.name + ': + ' + this.state.selectedCountry.dialCode }, React.createElement('div', { className: inputFlagClasses, style: this.getFlagStyle() }, React.createElement('div', { className: arrowClasses }))), this.state.showDropDown ? this.getCountryDropDownList() : ''));
     }
 });
 
-module.exports = ReactTelephoneInput;
+exports.ReactTelephoneInput = ReactTelephoneInput;
+exports['default'] = onClickOutside(ReactTelephoneInput);
 
-},{"./country_data":85,"classnames":undefined,"lodash/array/findIndex":2,"lodash/array/first":3,"lodash/array/rest":5,"lodash/collection/any":6,"lodash/collection/filter":7,"lodash/collection/findWhere":9,"lodash/collection/map":10,"lodash/collection/reduce":11,"lodash/collection/some":12,"lodash/function/debounce":14,"lodash/function/memoize":15,"lodash/lang/isFunction":74,"lodash/string/startsWith":81,"lodash/string/trim":82,"react":undefined,"react-onclickoutside":undefined}]},{},[]);
+},{"./country_data.js":91,"classnames":undefined,"lodash/array/findIndex":2,"lodash/array/first":3,"lodash/array/rest":5,"lodash/collection/filter":6,"lodash/collection/findWhere":8,"lodash/collection/map":9,"lodash/collection/reduce":10,"lodash/collection/some":11,"lodash/function/debounce":13,"lodash/function/memoize":14,"lodash/lang/isEqual":78,"lodash/object/assign":83,"lodash/string/startsWith":87,"lodash/string/trim":88,"react":undefined,"react-dom":undefined,"react-onclickoutside":undefined}]},{},[]);
