@@ -39,6 +39,7 @@
     "jest": "18.1.0",
     "react": "^15.3.2",
     "react-addons-test-utils": ">=0.14.0 || ^15.0.0",
+    "react-component-gulp-tasks": "^0.7.7",
     "react-dom": "^15.3.2",
     "react-test-renderer": "15.4.2",
     "rimraf": "2.5.4"
@@ -46,7 +47,7 @@
   "dependencies": {
     "babel-cli": "^6.24.1",
     "classnames": "^2.1.2",
-    "country-telephone-data": "0.4.2",
+    "country-telephone-data": "s3rious/country-telephone-data",
     "lodash": "^4.17.4",
     "react-onclickoutside": "^5.11.1"
   },
